@@ -6,153 +6,125 @@ package com.mssm.demoversion.activity;
  * @since 2023/7/10
  **/
 
-import android.app.ActionBar;
+import android.annotation.SuppressLint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.jaeger.library.StatusBarUtil;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.util.Utils;
+import com.mssm.demoversion.util.cache.PreloadManager;
+import com.mssm.demoversion.view.Advance;
+import com.mssm.demoversion.view.AdvanceView;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideoPlayActivity extends AppCompatActivity implements View.OnClickListener,
-        MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
-
-    private static final String TAG = "VideoPlayActivity";
-
-    // 播放视频预览界面
-    private SurfaceView surfaceVideo;
-
-    // meidiaplayer对象
-    private MediaPlayer mediaPlayer;
-
-    //播放列表
-    private List<Uri> playlist;
-
-    private int currentVideoIndex;
+public class VideoPlayActivity extends AppCompatActivity {
+    private AdvanceView mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
+        StatusBarUtil.setTranslucentForImageView(this,0,null);
         Utils.hideActionBar(this);
-        init();
+        initView();
+        initData();
+        //模拟刷新数据,自行放开
+//         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                initData();
+//            }
+//        },20000);
     }
 
-    /**
-     * 初始化工作
-     */
-    private void init() {
-        playlist = new ArrayList<>();
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_2));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_3));
-        // 播放视频预览界面
-        surfaceVideo = findViewById(R.id.surface_video);
-        // 设置点击事件
-        surfaceVideo.setOnClickListener(this::onClick);
-        // meidiaplayer对象
-        mediaPlayer = new MediaPlayer();
-        currentVideoIndex = 0;
-        // 设置准备监听
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
-        startPlay();
+    private final List<Advance> data = new ArrayList<>();
+    private void initData(){
+        data.clear();
+        //https://t7.baidu.com/it/u=1956604245,3662848045&fm=193&f=GIF
+        Advance advance1= new Advance(toURLString("https://t7.baidu.com/it/u=1956604245,3662848045&fm=193&f=GIF").trim(),"2");
+        data.add(advance1);
+        Advance advance = new Advance(toURLString("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4").trim(),"1");
+        data.add(advance);
+        Advance advance2 = new Advance("http://vjs.zencdn.net/v/oceans.mp4","1");
+        data.add(advance2);
+        Advance advance3 = new Advance(toURLString("https://t7.baidu.com/it/u=1415984692,3889465312&fm=193&f=GIF").trim(),"2");
+        data.add(advance3);
+        mViewPager.setData(data);
     }
-
-    @Override
-    public void onClick(View v) {
-        Log.d(TAG, "onClick: Easyhood");
-    }
-
-    /**
-     * 开始播放回调
-     *
-     * @param mp the MediaPlayer that is ready for playback
-     */
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        Log.d(TAG, "onPrepared: Easyhood");
-        mediaPlayer.start();
-    }
-
-    /**
-     * 结束播放回调
-     *
-     * @param mp the MediaPlayer that reached the end of the file
-     */
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        Log.d(TAG, "onCompletion: Easyhood");
-        playNextVideo();
-    }
-
-    /**
-     * 开始播放视频
-     */
-    private void startPlay() {
-        Log.d(TAG, "startPlay: Easyhood");
-        surfaceVideo.getHolder().addCallback(new SurfaceHolder.Callback() {
+    @SuppressLint("ClickableViewAccessibility")
+    private void initView() {
+        mViewPager = findViewById(R.id.home_vp);
+        mViewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceCreated: Easyhood");
-                //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
-                try {
-//
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1);
-                    mediaPlayer.setDataSource(getApplicationContext(), uri);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.prepare();
-                    mediaPlayer.setDisplay(surfaceVideo.getHolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "surfaceChanged: Easyhood");
-            }
-
-            @Override
-            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceDestroyed: Easyhood");
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
             }
         });
+
     }
+
 
     /**
-     * 播放下一个视频
+     * @param str 解决中文路径
+     * @return
      */
-    private void playNextVideo() {
-        if (currentVideoIndex < playlist.size() - 1) {
-            currentVideoIndex++;
-        } else {
-            currentVideoIndex = 0; // 如果已经是列表中的最后一个视频，回到列表开头
+    public static String toURLString(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char charAt = str.charAt(i);
+            if (charAt > 255) {
+                try {
+                    sb.append(URLEncoder.encode(String.valueOf(charAt), "utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                sb.append(charAt);
+            }
         }
-
-        Uri nextVideoUri = playlist.get(currentVideoIndex);
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(getApplicationContext(), nextVideoUri);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDisplay(surfaceVideo.getHolder()); // surfaceHolder 是用于显示视频的SurfaceHolder对象
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return sb.toString();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mViewPager.setResume();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mViewPager.setPause();
+    }
+
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mViewPager.setDestroy();
+        PreloadManager.getInstance(this).removeAllPreloadTask();
+    }
 }
