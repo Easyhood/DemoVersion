@@ -7,11 +7,13 @@ package com.mssm.demoversion.activity;
  **/
 
 import android.annotation.SuppressLint;
+import android.app.appsearch.AppSearchSchema;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -31,20 +33,25 @@ import com.mssm.demoversion.util.cache.PreloadManager;
 import com.mssm.demoversion.view.Advance;
 import com.mssm.demoversion.view.AdvanceView;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VideoPlayActivity extends AppCompatActivity {
+
+    private static final String TAG = "VideoPlayActivity";
+
     private AdvanceView mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
-        StatusBarUtil.setTranslucentForImageView(this,0,null);
+        StatusBarUtil.setTranslucentForImageView(this, 0, null);
         Utils.hideActionBar(this);
         initView();
         initData();
@@ -58,19 +65,47 @@ public class VideoPlayActivity extends AppCompatActivity {
     }
 
     private final List<Advance> data = new ArrayList<>();
-    private void initData(){
+
+    /**
+     * 初始化数据
+     */
+
+    private void initData() {
         data.clear();
-        //https://t7.baidu.com/it/u=1956604245,3662848045&fm=193&f=GIF
-        Advance advance1= new Advance(toURLString("https://t7.baidu.com/it/u=1956604245,3662848045&fm=193&f=GIF").trim(),"2");
+        Advance advance1 = new Advance(getDataPath("mspg_1.jpg"), "2");
         data.add(advance1);
-        Advance advance = new Advance(toURLString("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4").trim(),"1");
-        data.add(advance);
-        Advance advance2 = new Advance("http://vjs.zencdn.net/v/oceans.mp4","1");
+        Advance advance2 = new Advance(getDataPath("mspg_2.jpg"), "2");
         data.add(advance2);
-        Advance advance3 = new Advance(toURLString("https://t7.baidu.com/it/u=1415984692,3889465312&fm=193&f=GIF").trim(),"2");
+        Advance advance3 = new Advance(getDataPath("mspg_3.jpg"), "2");
         data.add(advance3);
+        Advance advance4 = new Advance(getDataPath("mspg_4.jpg"), "2");
+        data.add(advance4);
+        Advance advance5 = new Advance(getDataPath("mspg_5.jpg"), "2");
+        data.add(advance5);
+        Advance advance6 = new Advance(getDataPath("mspg_6.jpg"), "2");
+        data.add(advance6);
+        Advance advance7 = new Advance(getDataPath("mssm_1.mp4"), "1");
+        data.add(advance7);
+        Advance advance8 = new Advance(getDataPath("mssm_2.mp4"), "1");
+        data.add(advance8);
+        Advance advance9 = new Advance(getDataPath("mssm_3.mp4"), "1");
+        data.add(advance9);
         mViewPager.setData(data);
     }
+
+    /**
+     * 获取文件路径
+     *
+     * @param sourcePath String
+     * @return dataUrl
+     */
+    private String getDataPath(String sourceId) {
+        String folderUrl = new File(Environment.getExternalStorageDirectory(), sourceId).
+                getAbsolutePath();
+        Log.d(TAG, "Easy getDataPath: " + folderUrl);
+        return folderUrl;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
         mViewPager = findViewById(R.id.home_vp);
@@ -117,8 +152,6 @@ public class VideoPlayActivity extends AppCompatActivity {
         super.onPause();
         mViewPager.setPause();
     }
-
-
 
 
     @Override

@@ -11,8 +11,11 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.view.View;
+
+import java.net.URL;
 
 public class Utils {
     private static final String TAG = "Utils";
@@ -54,4 +57,5 @@ public class Utils {
             actionBar.hide();
         }
     }
+
 }
