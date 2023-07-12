@@ -1,15 +1,15 @@
 package com.mssm.demoversion.view;
 
-/**
- * @author Easyhood
- * @desciption CustomIjkMediaPlayer播放器
- * @since 2023/7/11
- **/
 import android.content.Context;
 
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import xyz.doikki.videoplayer.ijk.IjkPlayer;
 
+/**
+ * @author Easyhood
+ * @desciption CustomIjkMediaPlayer播放器
+ * @since 2023/7/11
+ **/
 public class CustomIjkMediaPlayer extends IjkPlayer {
 
     public CustomIjkMediaPlayer(Context context) {

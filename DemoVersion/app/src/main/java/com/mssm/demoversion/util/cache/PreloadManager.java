@@ -1,10 +1,5 @@
 package com.mssm.demoversion.util.cache;
 
-/**
- * @author Easyhood
- * @desciption 抖音预加载工具，使用AndroidVideoCache实现
- * @since 2023/7/11
- **/
 import android.content.Context;
 
 import com.danikula.videocache.HttpProxyCacheServer;
@@ -18,6 +13,11 @@ import java.util.concurrent.Executors;
 
 import xyz.doikki.videoplayer.util.L;
 
+/**
+ * @author Easyhood
+ * @desciption 抖音预加载工具，使用AndroidVideoCache实现
+ * @since 2023/7/11
+ **/
 public class PreloadManager {
 
     private static PreloadManager sPreloadManager;

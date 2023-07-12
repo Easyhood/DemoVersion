@@ -1,10 +1,5 @@
 package com.mssm.demoversion.util.cache;
 
-/**
- * @author Easyhood
- * @desciption 网络视频缓存管理类
- * @since 2023/7/11
- **/
 import android.content.Context;
 
 import com.danikula.videocache.HttpProxyCacheServer;
@@ -12,6 +7,11 @@ import com.danikula.videocache.StorageUtils;
 
 import java.io.File;
 
+/**
+ * @author Easyhood
+ * @desciption 网络视频缓存管理类
+ * @since 2023/7/11
+ **/
 public class ProxyVideoCacheManager {
 
     private static HttpProxyCacheServer sharedProxy;

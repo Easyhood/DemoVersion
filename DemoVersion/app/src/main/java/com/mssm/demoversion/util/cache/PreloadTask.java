@@ -1,13 +1,6 @@
 package com.mssm.demoversion.util.cache;
 
-/**
- * @author Easyhood
- * @desciption 原理：主动去请求VideoCache生成的代理地址，触发VideoCache缓存机制
- * 缓存到 PreloadManager.PRELOAD_LENGTH 的数据之后停止请求，完成预加载
- * 播放器去播放VideoCache生成的代理地址的时候，VideoCache会直接返回缓存数据，
- * 从而提升播放速度
- * @since 2023/7/11
- **/
+
 import com.danikula.videocache.HttpProxyCacheServer;
 
 import java.io.BufferedInputStream;
@@ -20,6 +13,14 @@ import java.util.concurrent.ExecutorService;
 
 import xyz.doikki.videoplayer.util.L;
 
+/**
+ * @author Easyhood
+ * @desciption 原理：主动去请求VideoCache生成的代理地址，触发VideoCache缓存机制
+ * 缓存到 PreloadManager.PRELOAD_LENGTH 的数据之后停止请求，完成预加载
+ * 播放器去播放VideoCache生成的代理地址的时候，VideoCache会直接返回缓存数据，
+ * 从而提升播放速度
+ * @since 2023/7/11
+ **/
 public class PreloadTask implements Runnable {
 
     /**

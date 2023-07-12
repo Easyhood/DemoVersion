@@ -1,10 +1,5 @@
 package com.mssm.demoversion.view;
 
-/**
- * @author Easyhood
- * @desciption Ijk播放Video的View
- * @since 2023/7/11
- **/
 import android.content.Context;
 import android.util.AttributeSet;
 
@@ -17,6 +12,11 @@ import java.util.Map;
 import xyz.doikki.videoplayer.player.BaseVideoView;
 import xyz.doikki.videoplayer.player.PlayerFactory;
 
+/**
+ * @author Easyhood
+ * @desciption Ijk播放Video的View
+ * @since 2023/7/11
+ **/
 public class IjkVideoView extends BaseVideoView<CustomIjkMediaPlayer> {
 
     private final HashMap<String, Object> mPlayerOptions = new HashMap<>();

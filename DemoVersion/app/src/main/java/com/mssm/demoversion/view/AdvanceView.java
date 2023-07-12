@@ -1,10 +1,5 @@
 package com.mssm.demoversion.view;
 
-/**
- * @author Easyhood
- * @desciption 播放控件，其实是ViewPager切换
- * @since 2023/7/11
- **/
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,6 +12,11 @@ import androidx.viewpager.widget.ViewPager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Easyhood
+ * @desciption 播放控件，其实是ViewPager切换
+ * @since 2023/7/11
+ **/
 public class AdvanceView extends RelativeLayout {
     private ViewPager viewPager;
     private List<View> views = new ArrayList<>();

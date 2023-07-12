@@ -3,7 +3,6 @@ package com.mssm.demoversion.download;
 import static com.mssm.demoversion.util.Constant.BIG_FILE_URLS;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -34,7 +33,9 @@ public class MultiDownload {
                 if(task.getListener() != downloadListener){
                     return;
                 }
-                Log.d("feifei","pending taskId:"+task.getId()+",fileName:"+task.getFilename()+",soFarBytes:"+soFarBytes+",totalBytes:"+totalBytes+",percent:"+soFarBytes*1.0/totalBytes);
+                Log.d("feifei","pending taskId:"+task.getId()+",fileName:"
+                        +task.getFilename()+",soFarBytes:"+soFarBytes+",totalBytes:"
+                        +totalBytes+",percent:"+soFarBytes*1.0/totalBytes);
 
             }
 
@@ -43,7 +44,9 @@ public class MultiDownload {
                 if(task.getListener() != downloadListener){
                     return;
                 }
-                Log.d("feifei","progress taskId:"+task.getId()+",fileName:"+task.getFilename()+",soFarBytes:"+soFarBytes+",totalBytes:"+totalBytes+",percent:"+soFarBytes*1.0/totalBytes+",speed:"+task.getSpeed());
+                Log.d("feifei","progress taskId:"+task.getId()+",fileName:"
+                        +task.getFilename()+",soFarBytes:"+soFarBytes+",totalBytes:"
+                        +totalBytes+",percent:"+soFarBytes*1.0/totalBytes+",speed:"+task.getSpeed());
             }
 
             @Override
@@ -51,7 +54,9 @@ public class MultiDownload {
                 if(task.getListener() != downloadListener){
                     return;
                 }
-                Log.d("feifei","blockComplete taskId:"+task.getId()+",filePath:"+task.getPath()+",fileName:"+task.getFilename()+",speed:"+task.getSpeed()+",isReuse:"+task.reuse());
+                Log.d("feifei","blockComplete taskId:"+task.getId()+",filePath:"
+                        +task.getPath()+",fileName:"+task.getFilename()+",speed:"
+                        +task.getSpeed()+",isReuse:"+task.reuse());
             }
 
             @Override
@@ -67,7 +72,8 @@ public class MultiDownload {
                 if(task.getListener() != downloadListener){
                     return;
                 }
-                Log.d("feifei","paused taskId:"+task.getId()+",soFarBytes:"+soFarBytes+",totalBytes:"+totalBytes+",percent:"+soFarBytes*1.0/totalBytes);
+                Log.d("feifei","paused taskId:"+task.getId()+",soFarBytes:"+soFarBytes
+                        +",totalBytes:"+totalBytes+",percent:"+soFarBytes*1.0/totalBytes);
             }
 
             @Override
@@ -96,9 +102,11 @@ public class MultiDownload {
 
         //(2) 创建Task 队列
         final List<BaseDownloadTask> tasks = new ArrayList<>();
-        BaseDownloadTask task1 = FileDownloader.getImpl().create(BIG_FILE_URLS[3]).setPath(mSaveFolder,true);
+        BaseDownloadTask task1 = FileDownloader.getImpl().create(BIG_FILE_URLS[3])
+                .setPath(mSaveFolder,true);
         tasks.add(task1);
-        BaseDownloadTask task2 = FileDownloader.getImpl().create(BIG_FILE_URLS[4]).setPath(mSaveFolder,true);
+        BaseDownloadTask task2 = FileDownloader.getImpl().create(BIG_FILE_URLS[4])
+                .setPath(mSaveFolder,true);
         tasks.add(task2);
 
         //(3) 设置参数

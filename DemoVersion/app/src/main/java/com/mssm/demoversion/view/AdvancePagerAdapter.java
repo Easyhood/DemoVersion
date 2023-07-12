@@ -1,10 +1,5 @@
 package com.mssm.demoversion.view;
 
-/**
- * @author Easyhood
- * @desciption ViewPager适配器
- * @since 2023/7/11
- **/
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +18,11 @@ import java.util.List;
 import xyz.doikki.videoplayer.player.BaseVideoView;
 import xyz.doikki.videoplayer.player.VideoView;
 
+/**
+ * @author Easyhood
+ * @desciption ViewPager适配器
+ * @since 2023/7/11
+ **/
 public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
         BaseVideoView.OnStateChangeListener {
     private Context context;

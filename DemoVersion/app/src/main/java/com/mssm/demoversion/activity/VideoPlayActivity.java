@@ -1,11 +1,5 @@
 package com.mssm.demoversion.activity;
 
-/**
- * @author Easyhood
- * @desciption 视频播放界面
- * @since 2023/7/10
- **/
-
 import android.annotation.SuppressLint;
 import android.app.appsearch.AppSearchSchema;
 import android.media.AudioManager;
@@ -41,6 +35,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Easyhood
+ * @desciption 视频播放界面
+ * @since 2023/7/10
+ **/
 public class VideoPlayActivity extends AppCompatActivity {
 
     private static final String TAG = "VideoPlayActivity";

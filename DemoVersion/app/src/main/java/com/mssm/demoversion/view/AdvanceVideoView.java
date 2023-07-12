@@ -1,11 +1,5 @@
 package com.mssm.demoversion.view;
 
-/**
- * @author Easyhood
- * @desciption 视频展示View
- * @since 2023/7/11
- **/
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -21,6 +15,11 @@ import com.mssm.demoversion.R;
 
 import xyz.doikki.videoplayer.player.VideoView;
 
+/**
+ * @author Easyhood
+ * @desciption 视频展示View
+ * @since 2023/7/11
+ **/
 public class AdvanceVideoView extends RelativeLayout {
     public ImageView imageView;
     private VideoView videoView;

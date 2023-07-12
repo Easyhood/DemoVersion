@@ -1,11 +1,5 @@
 package com.mssm.demoversion.util;
 
-/**
- * @author Easyhood
- * @desciption 工具类
- * @since 2023/7/10
- **/
-
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -17,6 +11,11 @@ import android.view.View;
 
 import java.net.URL;
 
+/**
+ * @author Easyhood
+ * @desciption 工具类
+ * @since 2023/7/10
+ **/
 public class Utils {
     private static final String TAG = "Utils";
 
@@ -57,5 +56,5 @@ public class Utils {
             actionBar.hide();
         }
     }
- 
+
 }

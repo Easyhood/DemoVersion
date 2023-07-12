@@ -1,11 +1,5 @@
 package com.mssm.demoversion.base;
 
-/**
- * @author Easyhood
- * @desciption 基础application类
- * @since 2023/7/11
- **/
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -29,6 +23,11 @@ import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoViewConfig;
 import xyz.doikki.videoplayer.player.VideoViewManager;
 
+/**
+ * @author Easyhood
+ * @desciption 基础application类
+ * @since 2023/7/11
+ **/
 public class BaseApplication extends Application {
     public static BaseApplication instances;
 
