@@ -2,7 +2,7 @@ package com.mssm.demoversion.util;
 
 /**
  * @author Easyhood
- * @desciption 弱handler工具类
+ * @desciption 弱引用handler工具类
  * @since 2023/7/11
  **/
 import android.os.Handler;

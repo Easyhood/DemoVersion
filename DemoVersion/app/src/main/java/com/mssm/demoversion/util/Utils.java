@@ -57,5 +57,5 @@ public class Utils {
             actionBar.hide();
         }
     }
-
+ 
 }
