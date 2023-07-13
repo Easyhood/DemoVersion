@@ -62,5 +62,6 @@ dependencies {
     implementation 'com.github.getActivity:GsonFactory:5.2'
     implementation 'com.tencent:mmkv-static:1.2.11'
     implementation 'com.liulishuo.filedownloader:library:1.7.7'
+    implementation 'com.github.wangshihu123:DaemonLibrary:v1.2.1'
 
 }

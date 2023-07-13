@@ -51,6 +51,7 @@ public class VideoPlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
         StatusBarUtil.setTranslucentForImageView(this, 0, null);
+        Utils.checkPermission(this);
         Utils.hideActionBar(this);
         initView();
         initData();
