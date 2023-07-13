@@ -42,6 +42,7 @@ public class BaseApplication extends Application {
         AutoSize.initCompatMultiProcess(this);
         initVideoPlay();
         initHttpRequest();
+        initFileDownload();
     }
 
     /**

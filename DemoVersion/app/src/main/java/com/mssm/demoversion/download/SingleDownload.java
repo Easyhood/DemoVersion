@@ -21,7 +21,6 @@ public class SingleDownload {
     String singleFileSaveName = "liulishuo.apk";
     public String mSinglePath = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save"
             + File.separator + singleFileSaveName;
-    ;
     public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
 
     public void start_single() {
@@ -30,7 +29,9 @@ public class SingleDownload {
         singleTask = FileDownloader.getImpl().create(url)
 //                .setPath(mSinglePath,false)
                 .setPath(mSinglePath, true)
+                // 最大回调次数
                 .setCallbackProgressTimes(300)
+                // 每个回调之间的间隔
                 .setMinIntervalUpdateSpeed(400)
                 //.setTag()
                 .setListener(new FileDownloadSampleListener() {

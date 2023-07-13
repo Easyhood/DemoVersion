@@ -1,11 +1,15 @@
 package com.mssm.demoversion.util;
 
+import android.content.Intent;
+
 /**
  * @author Easyhood
  * @desciption 命名、链接、地址等工具类
  * @since 2023/7/12
  **/
 public class Constant {
+
+    private static final String da = Intent.ACTION_BOOT_COMPLETED;
     public static String[] BIG_FILE_URLS = {
             // 5m
             "http://mirror.internode.on.net/pub/test/5meg.test5",

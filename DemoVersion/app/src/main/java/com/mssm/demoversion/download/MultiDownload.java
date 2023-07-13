@@ -114,8 +114,9 @@ public class MultiDownload {
         // 每个任务的进度 无回调
         //queueSet.disableCallbackProgressTimes();
         // do not want each task's download progress's callback,we just consider which task will completed.
-
+        // 最大回调次数
         queueSet.setCallbackProgressTimes(100);
+        // 每个回调之间的间隔
         queueSet.setCallbackProgressMinInterval(100);
         //失败 重试次数
         queueSet.setAutoRetryTimes(3);
