@@ -99,8 +99,8 @@ public class VideoPlayActivity extends AppCompatActivity {
      * @param sourcePath String
      * @return dataUrl
      */
-    private String getDataPath(String sourceId) {
-        String folderUrl = new File(Environment.getExternalStorageDirectory(), sourceId).
+    private String getDataPath(String sourcePath) {
+        String folderUrl = new File(Environment.getExternalStorageDirectory(), sourcePath).
                 getAbsolutePath();
         Log.d(TAG, "Easy getDataPath: " + folderUrl);
         return folderUrl;
@@ -144,6 +144,7 @@ public class VideoPlayActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mViewPager.setResume();
+        Utils.hideActionBar(this);
 
     }
 

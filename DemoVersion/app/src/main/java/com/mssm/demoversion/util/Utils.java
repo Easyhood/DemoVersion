@@ -5,11 +5,17 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.view.View;
 
-import java.net.URL;
+import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Easyhood
@@ -18,6 +24,8 @@ import java.net.URL;
  **/
 public class Utils {
     private static final String TAG = "Utils";
+
+    private static YF_RK356x_API_Manager yfapiManager;
 
     /**
      * 检查应用权限
@@ -41,6 +49,9 @@ public class Utils {
      * 隐藏状态栏和导航栏
      */
     public static void hideActionBar(Activity activity) {
+        yfapiManager = new YF_RK356x_API_Manager(activity.getApplicationContext());
+        yfapiManager.yfsetNavigationBarVisibility(false);
+        yfapiManager.yfsetStatusBarDisplay(false);
         View decorView = activity.getWindow().getDecorView();
         // Hide both the navigation bar and the status bar.
         // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
@@ -54,6 +65,78 @@ public class Utils {
         ActionBar actionBar = activity.getActionBar();
         if (actionBar != null) {
             actionBar.hide();
+        }
+    }
+
+    /**
+     * 判断某个文件是否存在
+     *
+     * @param sourcePath 文件绝对路径
+     * @return 文件是否存在
+     */
+    public static boolean isFileExists(String sourcePath) {
+        File file = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        if (!file.getParentFile().exists()) {
+            return false;
+        }
+        if (file.exists()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 拷贝raw资源到外部存储
+     * @param sourcePath 文件路径
+     * @param rawId 资源ID
+     * @param context Context
+     */
+    public static void copyRawFileToExDir(String sourcePath, int rawId, Context context) {
+        File dstFile = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        File parentDir = dstFile.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdir();
+        }
+        InputStream mIs = null;
+        OutputStream mOs = null;
+        try {
+            // 获取res/raw目录下的test.mp4文件的输入流
+            mIs = context.getResources().openRawResource(rawId);
+            // 获取外部存储路径下的test.mp4文件的输出流
+            mOs = new FileOutputStream(dstFile);
+            // 把输入流的内容复制到输出流
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = mIs.read(buffer)) > 0) {
+                mOs.write(buffer, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        } finally {
+            closeInAndOut(mIs, mOs);
+        }
+
+    }
+
+    /**
+     * 关闭流
+     * @param mIs 输入流
+     * @param mOs 输出流
+     */
+    public static void closeInAndOut(InputStream mIs, OutputStream mOs) {
+        try {
+            if (mIs != null) {
+                mIs.close();
+                mIs = null;
+            }
+            if (mOs != null) {
+                mOs.close();
+                mOs = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
