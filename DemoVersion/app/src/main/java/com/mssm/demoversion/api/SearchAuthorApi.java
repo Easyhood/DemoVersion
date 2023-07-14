@@ -15,7 +15,10 @@ public class SearchAuthorApi implements IRequestApi {
     public String getApi() {
         return "wxarticle/chapters/json";
     }
-    /** 公众号 id */
+
+    /**
+     * 公众号 id
+     */
     private int id;
 
     public SearchAuthorApi setId(int id) {

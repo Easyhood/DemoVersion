@@ -5,7 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 
 import com.hjq.http.EasyConfig;
-import com.hjq.http.config.IRequestHandler;
 import com.hjq.http.config.IRequestInterceptor;
 import com.hjq.http.config.IRequestServer;
 import com.hjq.http.model.HttpHeaders;
@@ -73,7 +72,7 @@ public class BaseApplication extends Application {
                     public void interceptArguments(@NonNull HttpRequest<?> httpRequest,
                                                    @NonNull HttpParams params,
                                                    @NonNull HttpHeaders headers) {
-                        headers.put("timestamp",String.valueOf(System.currentTimeMillis()));
+                        headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
                     }
                 })
                 // 设置请求重试次数

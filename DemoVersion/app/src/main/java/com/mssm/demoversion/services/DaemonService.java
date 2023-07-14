@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
@@ -86,12 +85,13 @@ public class DaemonService extends Service {
 
     /**
      * 创建通知通道
+     *
      * @param channelId
      * @param channelName
      * @return
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    private String createNotificationChannel(String channelId, String channelName){
+    private String createNotificationChannel(String channelId, String channelName) {
         NotificationChannel chan = new NotificationChannel(channelId,
                 channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
@@ -122,6 +122,7 @@ public class DaemonService extends Service {
 
     /**
      * 启动广播轮播界面，需要检测栈顶activity是否该界面，防止重复启动
+     *
      * @param context Context
      */
     private void startAdvertisePlayActivity(Context context) {

@@ -34,6 +34,7 @@ public class ProxyVideoCacheManager {
 
     /**
      * 删除所有缓存文件
+     *
      * @return 返回缓存是否删除成功
      */
     public static boolean clearAllCache(Context context) {
@@ -43,6 +44,7 @@ public class ProxyVideoCacheManager {
 
     /**
      * 删除url对应默认缓存文件
+     *
      * @return 返回缓存是否删除成功
      */
     public static boolean clearDefaultCache(Context context, String url) {

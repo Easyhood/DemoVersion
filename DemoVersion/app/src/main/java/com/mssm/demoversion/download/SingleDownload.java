@@ -15,6 +15,8 @@ import java.io.File;
  * @since 2023/7/12
  **/
 public class SingleDownload {
+
+    private static final String TAG = "SingleDownload";
     BaseDownloadTask singleTask;
     public int singleTaskId = 0;
     String apkUrl = "http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk";
@@ -37,7 +39,7 @@ public class SingleDownload {
                 .setListener(new FileDownloadSampleListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d("feifei", "pending taskId:" + task.getId() + ",soFarBytes:"
+                        Log.d(TAG, "pending taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes);
 
@@ -45,40 +47,40 @@ public class SingleDownload {
 
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d("feifei", "progress taskId:" + task.getId() + ",soFarBytes:"
+                        Log.d(TAG, "progress taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes + ",speed:" + task.getSpeed());
                     }
 
                     @Override
                     protected void blockComplete(BaseDownloadTask task) {
-                        Log.d("feifei", "blockComplete taskId:" + task.getId() + ",filePath:"
+                        Log.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
                                 + task.getPath() + ",fileName:" + task.getFilename()
                                 + ",speed:" + task.getSpeed() + ",isReuse:" + task.reuse());
                     }
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
-                        Log.d("feifei", "completed taskId:" + task.getId() + ",isReuse:"
+                        Log.d(TAG, "completed taskId:" + task.getId() + ",isReuse:"
                                 + task.reuse());
                     }
 
                     @Override
                     protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d("feifei", "paused taskId:" + task.getId() + ",soFarBytes:"
+                        Log.d(TAG, "paused taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes);
                     }
 
                     @Override
                     protected void error(BaseDownloadTask task, Throwable e) {
-                        Log.d("feifei", "error taskId:" + task.getId() + ",e:"
+                        Log.d(TAG, "error taskId:" + task.getId() + ",e:"
                                 + e.getLocalizedMessage());
                     }
 
                     @Override
                     protected void warn(BaseDownloadTask task) {
-                        Log.d("feifei", "warn taskId:" + task.getId());
+                        Log.d(TAG, "warn taskId:" + task.getId());
                     }
                 });
 
@@ -88,7 +90,7 @@ public class SingleDownload {
 
 
     public void pause_single() {
-        Log.d("feifei", "pause_single task:" + singleTaskId);
+        Log.d(TAG, "pause_single task:" + singleTaskId);
         FileDownloader.getImpl().pause(singleTaskId);
     }
 
@@ -102,7 +104,7 @@ public class SingleDownload {
             delate = targetFile.delete();
         }
 
-        Log.d("feifei", "delete_single file,deleteDataBase:" + deleteData
+        Log.d(TAG, "delete_single file,deleteDataBase:" + deleteData
                 + ",mSinglePath:" + mSinglePath + ",delate:" + delate);
 
         new File(FileDownloadUtils.getTempPath(mSinglePath)).delete();

@@ -46,7 +46,7 @@ public class AdvanceView extends RelativeLayout {
                 return true;
             }
         });
-        adapter = new AdvancePagerAdapter(getContext(),viewPager);
+        adapter = new AdvancePagerAdapter(getContext(), viewPager);
         viewPager.setAdapter(adapter);
         addView(viewPager, new LayoutParams(-1, -1));
     }
@@ -54,13 +54,16 @@ public class AdvanceView extends RelativeLayout {
     public void setData(List<Advance> advances) {
         adapter.setData(advances);
     }
-    public void setDestroy(){
+
+    public void setDestroy() {
         adapter.setDestroy();
     }
-    public void setPause(){
+
+    public void setPause() {
         adapter.setPause();
     }
-    public void setResume(){
+
+    public void setResume() {
         adapter.setResume();
     }
 }

@@ -91,7 +91,7 @@ public class PreloadTask implements Runnable {
                 }
             }
         } catch (Exception e) {
-            L.i("预加载异常：" + mPosition + " 异常信息："+ e.getMessage());
+            L.i("预加载异常：" + mPosition + " 异常信息：" + e.getMessage());
             // 关入小黑屋
             blackList.add(mRawUrl);
         } finally {

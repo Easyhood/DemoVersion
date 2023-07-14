@@ -94,9 +94,10 @@ public class Utils {
 
     /**
      * 拷贝raw资源到外部存储
+     *
      * @param sourcePath 文件路径
-     * @param rawId 资源ID
-     * @param context Context
+     * @param rawId      资源ID
+     * @param context    Context
      * @return 文件绝对路径
      */
     public static String copyRawFileToExDir(String sourcePath, int rawId, Context context) {
@@ -131,6 +132,7 @@ public class Utils {
 
     /**
      * 关闭流
+     *
      * @param mIs 输入流
      * @param mOs 输出流
      */
@@ -152,9 +154,10 @@ public class Utils {
 
     /**
      * 检查默认文件路径
+     *
      * @param sourcePath 文件名
-     * @param rawId 文件id
-     * @param context Context
+     * @param rawId      文件id
+     * @param context    Context
      * @return 文件路径
      */
     public static String checkDefaultFilePath(String sourcePath, int rawId, Context context) {
@@ -193,13 +196,14 @@ public class Utils {
 
     /**
      * 获取栈顶activity名字
+     *
      * @param context Context
      * @return topActivity
      */
     public static String getTopActivityName(Context context) {
         // get the top activity name
         String topActivity = "";
-        ActivityManager activityManager = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
         if (taskInfo != null && taskInfo.size() > 0) {
             topActivity = taskInfo.get(0).topActivity.getClassName();

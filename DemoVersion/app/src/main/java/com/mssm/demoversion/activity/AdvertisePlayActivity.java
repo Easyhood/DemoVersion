@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -79,12 +78,13 @@ public class AdvertisePlayActivity extends AppCompatActivity {
 
     /**
      * 加入到Advance照片数据中
+     *
      * @param sourcePath 文件名称
-     * @param rawId 文件ID
-     * @param context Context
+     * @param rawId      文件ID
+     * @param context    Context
      */
     private void addAdvancePhotoData(String sourcePath, int rawId, Context context) {
-        String path = Utils.checkDefaultFilePath(sourcePath ,rawId, context);
+        String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
             Advance advance = new Advance(path, "2");
@@ -94,12 +94,13 @@ public class AdvertisePlayActivity extends AppCompatActivity {
 
     /**
      * 加入到Advance视频数据中
+     *
      * @param sourcePath 文件名称
-     * @param rawId 文件ID
-     * @param context Context
+     * @param rawId      文件ID
+     * @param context    Context
      */
     private void addAdvanceVideoData(String sourcePath, int rawId, Context context) {
-        String path = Utils.checkDefaultFilePath(sourcePath ,rawId, context);
+        String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
             Advance advance = new Advance(path, "1");

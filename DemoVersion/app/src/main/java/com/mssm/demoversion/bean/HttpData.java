@@ -7,11 +7,17 @@ package com.mssm.demoversion.bean;
  **/
 public class HttpData<T> {
 
-    /** 返回码 */
+    /**
+     * 返回码
+     */
     private int errorCode;
-    /** 提示语 */
+    /**
+     * 提示语
+     */
     private String errorMsg;
-    /** 数据 */
+    /**
+     * 数据
+     */
     private T data;
 
     public int getCode() {

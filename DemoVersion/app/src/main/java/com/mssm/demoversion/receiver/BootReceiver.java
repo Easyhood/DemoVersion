@@ -1,13 +1,10 @@
 package com.mssm.demoversion.receiver;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
-
-import androidx.core.content.ContextCompat;
 
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
 
@@ -23,6 +20,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     /**
      * 启动轮播界面
+     *
      * @param context Context
      */
     private void startAdvertisePlayActivity(Context context) {

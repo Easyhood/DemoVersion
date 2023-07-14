@@ -1,7 +1,5 @@
 package com.mssm.demoversion.util;
 
-import android.content.Intent;
-
 /**
  * @author Easyhood
  * @desciption 命名、链接、地址等工具类

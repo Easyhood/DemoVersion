@@ -11,13 +11,21 @@ public class HttpListData<T> extends HttpData<HttpListData.ListBean<T>> {
 
     public static class ListBean<T> {
 
-        /** 当前页码 */
+        /**
+         * 当前页码
+         */
         private int pageIndex;
-        /** 页大小 */
+        /**
+         * 页大小
+         */
         private int pageSize;
-        /** 总数量 */
+        /**
+         * 总数量
+         */
         private int totalNumber;
-        /** 数据 */
+        /**
+         * 数据
+         */
         private List<T> items;
 
         /**

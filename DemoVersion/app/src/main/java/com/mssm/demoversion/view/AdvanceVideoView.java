@@ -42,7 +42,9 @@ public class AdvanceVideoView extends RelativeLayout {
         super(context, attrs, defStyleAttr);
         initView();
     }
+
     private PreloadManager mPreloadManager;
+
     private void initView() {
         videoRela = new RelativeLayout(getContext());
         addView(videoRela, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -51,15 +53,16 @@ public class AdvanceVideoView extends RelativeLayout {
         addView(imageView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
-    public void setImage(String path, VideoView  videoView, PreloadManager preloadManager) {
+    public void setImage(String path, VideoView videoView, PreloadManager preloadManager) {
         this.path = path;
         this.videoView = videoView;
         this.mPreloadManager = preloadManager;
-        Glide.with(getContext()) .setDefaultRequestOptions(
+        Glide.with(getContext()).setDefaultRequestOptions(
                 new RequestOptions()
                         .frame(0)
         ).load(path).into(imageView);
     }
+
     /**
      * 将View从父控件中移除
      */
@@ -70,6 +73,7 @@ public class AdvanceVideoView extends RelativeLayout {
             ((RelativeLayout) parent).removeView(v);
         }
     }
+
     public void setVideo() {
 //        if (videoView != null) {
 //            videoView.release();
@@ -103,8 +107,8 @@ public class AdvanceVideoView extends RelativeLayout {
 //        });
     }
 
-    public void setDestroy(){
-        if (videoView!=null){
+    public void setDestroy() {
+        if (videoView != null) {
             videoView.release();
         }
     }

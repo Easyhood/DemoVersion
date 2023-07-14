@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-
 import com.mssm.demoversion.util.WeakHandler;
 import com.mssm.demoversion.util.cache.PreloadManager;
 
@@ -38,6 +37,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     private int lastPosition = -1;
     private final VideoView videoView;
     private final PreloadManager mPreloadManager;
+
     public AdvancePagerAdapter(Context context, ViewPager viewPager) {
         this.context = context;
         mPreloadManager = PreloadManager.getInstance(context);
@@ -47,23 +47,24 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         videoView.addOnStateChangeListener(this);
         this.viewPager = viewPager;
     }
+
     private boolean isRunning = false;
 
     public void setData(List<Advance> advances) {
 
         if (advances.size() == 0) return;
         for (int i = 0; i < advances.size(); i++) {
-            if (advances.get(i).type.equals("1")){
-                mPreloadManager.addPreloadTask(advances.get(i).path,i);
+            if (advances.get(i).type.equals("1")) {
+                mPreloadManager.addPreloadTask(advances.get(i).path, i);
             }
         }
-        if (isRunning){
-            if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView){
+        if (isRunning) {
+            if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
                 ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setDestroy();
                 ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).currentPosition = 0;
             }
             stopTimer();
-        }else {
+        } else {
             viewPager.addOnPageChangeListener(this);
         }
         viewPager.removeAllViews();
@@ -94,7 +95,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     private void addView(Advance advance) {
         if (advance.type.equals("1")) {
             AdvanceVideoView videoView = new AdvanceVideoView(context);
-            videoView.setImage(advance.path,this.videoView,mPreloadManager);
+            videoView.setImage(advance.path, this.videoView, mPreloadManager);
             list.add(videoView);
         } else {
             AdvanceImageView imageView = new AdvanceImageView(context);
@@ -102,13 +103,15 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
             list.add(imageView);
         }
     }
+
     private final WeakHandler weakHandler = new WeakHandler();
-    public void startNewTimer(){
+
+    public void startNewTimer() {
         isRunning = true;
         weakHandler.post(timeRunnable);
     }
 
-    private void stopTimer(){
+    private void stopTimer() {
         isRunning = false;
         current = 0;
         lastPosition = -1;
@@ -118,14 +121,14 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     private final Runnable timeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!pause && !(list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView)){
-                current+=1000;
+            if (!pause && !(list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView)) {
+                current += 1000;
             }
             if (current >= time) {
                 viewPager.post(() -> viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true));
                 current = 0;
             }
-            weakHandler.postDelayed(this,1000);
+            weakHandler.postDelayed(this, 1000);
         }
     };
 
@@ -213,14 +216,15 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 //                        Log.e("xxx","xx"+((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.toString());
 //                        ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.VISIBLE);
 //                    }
-                    mPreloadManager.resumePreload(viewPager.getCurrentItem()-1,false);
+                    mPreloadManager.resumePreload(viewPager.getCurrentItem() - 1, false);
                     ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setVideo();
                 }
                 lastPosition = viewPager.getCurrentItem();
             }
         }
     }
-    public void setDestroy(){
+
+    public void setDestroy() {
         pause = true;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setDestroy();
@@ -228,6 +232,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         }
         weakHandler.removeCallbacksAndMessages(null);
     }
+
     public void setPause() {
         pause = true;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
@@ -251,23 +256,23 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void onPlayStateChanged(int playState) {
-        Log.e("xxx","xx"+playState);
-        if (playState== VideoView.STATE_PLAYBACK_COMPLETED){
-            if (list.get(viewPager.getCurrentItem())instanceof AdvanceVideoView){
+        Log.e("xxx", "xx" + playState);
+        if (playState == VideoView.STATE_PLAYBACK_COMPLETED) {
+            if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
                 ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).currentPosition = 0;
-                if ( ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView!=null){
+                if (((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView != null) {
                     ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.VISIBLE);
                 }
             }
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-        }else if (playState==VideoView.STATE_PLAYING){
-            if (list.get(viewPager.getCurrentItem())instanceof AdvanceVideoView){
-                if ( ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView!=null){
+        } else if (playState == VideoView.STATE_PLAYING) {
+            if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
+                if (((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView != null) {
                     ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.GONE);
                 }
             }
-        }else if (playState==VideoView.STATE_ERROR){
-            mPreloadManager.pausePreload(viewPager.getCurrentItem()-1,false);
+        } else if (playState == VideoView.STATE_ERROR) {
+            mPreloadManager.pausePreload(viewPager.getCurrentItem() - 1, false);
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
         }
     }

@@ -107,7 +107,7 @@ public class PreloadManager {
      * 暂停预加载
      * 根据是否反向滑动取消在position之下或之上的PreloadTask
      *
-     * @param position 当前滑到的位置
+     * @param position        当前滑到的位置
      * @param isReverseScroll 列表是否反向滑动
      */
     public void pausePreload(int position, boolean isReverseScroll) {

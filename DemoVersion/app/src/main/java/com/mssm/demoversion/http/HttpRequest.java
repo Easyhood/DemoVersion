@@ -24,11 +24,13 @@ public class HttpRequest implements OnHttpListener {
 
     /**
      * 构造方法
+     *
      * @param activity AppCompatActivity
      */
     public HttpRequest(AppCompatActivity activity) {
         mAppCompatActivity = activity;
     }
+
     /**
      * EasyHttp Get 请求
      */

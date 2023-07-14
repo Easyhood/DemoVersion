@@ -44,7 +44,7 @@ import okhttp3.ResponseBody;
  * @desciption 请求处理类
  * @since 2023/7/12
  **/
-public class RequestHandler implements IRequestHandler{
+public class RequestHandler implements IRequestHandler {
 
     private final Application mApplication;
     private final MMKV mMmkv;
@@ -80,7 +80,7 @@ public class RequestHandler implements IRequestHandler{
         }
 
         // 如果是用数组接收，判断一下是不是用 byte[] 类型进行接收的
-        if(type instanceof GenericArrayType) {
+        if (type instanceof GenericArrayType) {
             Type genericComponentType = ((GenericArrayType) type).getGenericComponentType();
             if (byte.class.equals(genericComponentType)) {
                 return body.bytes();
