@@ -9,7 +9,7 @@ import android.os.HandlerThread;
 
 import androidx.core.content.ContextCompat;
 
-import com.mssm.demoversion.activity.VideoPlayActivity;
+import com.mssm.demoversion.activity.AdvertisePlayActivity;
 
 /**
  * @author Easyhood
@@ -25,8 +25,8 @@ public class BootReceiver extends BroadcastReceiver {
      * 启动轮播界面
      * @param context Context
      */
-    private void startVideoPlayActivity(Context context) {
-        Intent intentMain = new Intent(context, VideoPlayActivity.class);
+    private void startAdvertisePlayActivity(Context context) {
+        Intent intentMain = new Intent(context, AdvertisePlayActivity.class);
         intentMain.setAction("android.intent.action.MAIN");
         intentMain.addCategory(Intent.CATEGORY_LAUNCHER);
         intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -45,7 +45,7 @@ public class BootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             // better delay some time.
-            startVideoPlayActivity(context);
+            startAdvertisePlayActivity(context);
         }
     }
 }

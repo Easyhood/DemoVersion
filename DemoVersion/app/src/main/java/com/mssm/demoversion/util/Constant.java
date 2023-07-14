@@ -9,7 +9,9 @@ import android.content.Intent;
  **/
 public class Constant {
 
-    private static final String da = Intent.ACTION_BOOT_COMPLETED;
+    public static final String ACTION_DESTROYED = "com.mssm.action.DESTROYED";
+
+    public static final int DELAY_MILLIS = 30000;
     public static String[] BIG_FILE_URLS = {
             // 5m
             "http://mirror.internode.on.net/pub/test/5meg.test5",

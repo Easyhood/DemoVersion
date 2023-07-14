@@ -1,11 +1,15 @@
 package com.mssm.demoversion.util;
 
+import static android.content.Context.ACTIVITY_SERVICE;
+
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
@@ -16,6 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * @author Easyhood
@@ -90,8 +97,9 @@ public class Utils {
      * @param sourcePath 文件路径
      * @param rawId 资源ID
      * @param context Context
+     * @return 文件绝对路径
      */
-    public static void copyRawFileToExDir(String sourcePath, int rawId, Context context) {
+    public static String copyRawFileToExDir(String sourcePath, int rawId, Context context) {
         File dstFile = new File("/storage/emulated/0/MSSMDefault", sourcePath);
         File parentDir = dstFile.getParentFile();
         if (!parentDir.exists()) {
@@ -116,6 +124,7 @@ public class Utils {
             ioException.printStackTrace();
         } finally {
             closeInAndOut(mIs, mOs);
+            return dstFile.getAbsolutePath();
         }
 
     }
@@ -138,6 +147,64 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * 检查默认文件路径
+     * @param sourcePath 文件名
+     * @param rawId 文件id
+     * @param context Context
+     * @return 文件路径
+     */
+    public static String checkDefaultFilePath(String sourcePath, int rawId, Context context) {
+        String path = null;
+        File dstFile = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        boolean isFileExists = isFileExists(sourcePath);
+        Log.d(TAG, "checkDefaultFilePath: isFileExists = " + isFileExists);
+        if (!isFileExists) {
+            path = copyRawFileToExDir(sourcePath, rawId, context);
+        } else {
+            path = dstFile.getAbsolutePath();
+        }
+        return path;
+    }
+
+    /**
+     * @param str 解决中文路径
+     * @return sb.toString()
+     */
+    public static String toURLString(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char charAt = str.charAt(i);
+            if (charAt > 255) {
+                try {
+                    sb.append(URLEncoder.encode(String.valueOf(charAt), "utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                sb.append(charAt);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 获取栈顶activity名字
+     * @param context Context
+     * @return topActivity
+     */
+    public static String getTopActivityName(Context context) {
+        // get the top activity name
+        String topActivity = "";
+        ActivityManager activityManager = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+        if (taskInfo != null && taskInfo.size() > 0) {
+            topActivity = taskInfo.get(0).topActivity.getClassName();
+        }
+        return topActivity;
     }
 
 }
