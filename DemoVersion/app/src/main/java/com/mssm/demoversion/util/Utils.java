@@ -12,6 +12,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.View;
 
+import com.mssm.demoversion.base.BaseApplication;
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
 import java.io.File;
@@ -209,6 +210,17 @@ public class Utils {
             topActivity = taskInfo.get(0).topActivity.getClassName();
         }
         return topActivity;
+    }
+
+    /**
+     * 获取当前设备SN号
+     * @return serialNumber
+     */
+    public static String getDeviceSnNumber() {
+        String serialNumber = "E3D79E9E60F3625";
+        // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+        // serialNumber = yfapiManager.yfgetSerialNumber();
+        return serialNumber;
     }
 
 }

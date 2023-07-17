@@ -30,7 +30,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     private List<View> list = new ArrayList<>();
 
     private int current = 0;
-    private int time = 5000;
+    private int time = 3000;
     private boolean pause;
     private Thread thread;
 
