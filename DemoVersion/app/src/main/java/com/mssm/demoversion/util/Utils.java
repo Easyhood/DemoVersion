@@ -217,10 +217,10 @@ public class Utils {
      * @return serialNumber
      */
     public static String getDeviceSnNumber() {
-        String serialNumber = "E3D79E9E60F3625";
+        String serialNumberStr = "1E3D79E9E60F3625";
         // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
         // serialNumber = yfapiManager.yfgetSerialNumber();
-        return serialNumber;
+        return serialNumberStr;
     }
 
 }

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jaeger.library.StatusBarUtil;
 import com.mssm.demoversion.R;
+import com.mssm.demoversion.http.HttpRequest;
 import com.mssm.demoversion.services.DaemonService;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.Utils;
@@ -45,6 +46,7 @@ public class AdvertisePlayActivity extends AppCompatActivity {
         Utils.hideActionBar(this);
         initView();
         initData();
+        HttpRequest.requestAdvertisePlan();
         //模拟刷新数据,自行放开
 //         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
 //            @Override
