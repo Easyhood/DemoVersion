@@ -2,6 +2,7 @@ package com.mssm.demoversion.download;
 
 import static com.mssm.demoversion.util.Constant.BIG_FILE_URLS;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -10,6 +11,8 @@ import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
+import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.util.CallBackUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,7 +28,10 @@ public class MultiDownload {
     // 多任务下载
     private FileDownloadListener downloadListener;
 
-    public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
+    private int mTaskCount;
+
+    //public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
+    public static String mSaveFolder = Environment.getExternalStorageDirectory() + "/MSSMDownload";
 
     public FileDownloadListener createLis() {
         return new FileDownloadSampleListener() {
@@ -58,10 +64,17 @@ public class MultiDownload {
                 Log.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
                         + task.getPath() + ",fileName:" + task.getFilename() + ",speed:"
                         + task.getSpeed() + ",isReuse:" + task.reuse());
+                mTaskCount --;
+                Log.d(TAG, "blockComplete: mTaskCount = " + mTaskCount);
+                if (mTaskCount == 0) {
+                    completed(task);
+                }
             }
 
             @Override
             protected void completed(BaseDownloadTask task) {
+                Log.d(TAG, "completed");
+                CallBackUtils.doCallBackMethod();
                 if (task.getListener() != downloadListener) {
                     return;
                 }
@@ -95,30 +108,22 @@ public class MultiDownload {
         };
     }
 
-    public void start_multi() {
+    public void start_multi(final List<BaseDownloadTask> tasks) {
 
         downloadListener = createLis();
         //(1) 创建 FileDownloadQueueSet
         final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
 
         //(2) 创建Task 队列
-        final List<BaseDownloadTask> tasks = new ArrayList<>();
-        BaseDownloadTask task1 = FileDownloader.getImpl().create(BIG_FILE_URLS[3])
-                .setPath(mSaveFolder, true);
-        tasks.add(task1);
-        BaseDownloadTask task2 = FileDownloader.getImpl().create(BIG_FILE_URLS[4])
-                .setPath(mSaveFolder, true);
-        tasks.add(task2);
 
         //(3) 设置参数
-
         // 每个任务的进度 无回调
-        //queueSet.disableCallbackProgressTimes();
+        queueSet.disableCallbackProgressTimes();
         // do not want each task's download progress's callback,we just consider which task will completed.
         // 最大回调次数
-        queueSet.setCallbackProgressTimes(100);
+        //queueSet.setCallbackProgressTimes(100);
         // 每个回调之间的间隔
-        queueSet.setCallbackProgressMinInterval(100);
+        //queueSet.setCallbackProgressMinInterval(100);
         //失败 重试次数
         queueSet.setAutoRetryTimes(3);
 
@@ -127,6 +132,8 @@ public class MultiDownload {
 
         //(4)串行下载
         queueSet.downloadSequentially(tasks);
+
+        mTaskCount = tasks.size();
 
         //(5)任务启动
         queueSet.start();

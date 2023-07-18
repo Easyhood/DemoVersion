@@ -9,6 +9,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
@@ -83,7 +84,7 @@ public class Utils {
      * @return 文件是否存在
      */
     public static boolean isFileExists(String sourcePath) {
-        File file = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        File file = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
         if (!file.getParentFile().exists()) {
             return false;
         }
@@ -102,7 +103,7 @@ public class Utils {
      * @return 文件绝对路径
      */
     public static String copyRawFileToExDir(String sourcePath, int rawId, Context context) {
-        File dstFile = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        File dstFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
         File parentDir = dstFile.getParentFile();
         if (!parentDir.exists()) {
             parentDir.mkdir();
@@ -163,7 +164,7 @@ public class Utils {
      */
     public static String checkDefaultFilePath(String sourcePath, int rawId, Context context) {
         String path = null;
-        File dstFile = new File("/storage/emulated/0/MSSMDefault", sourcePath);
+        File dstFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
         boolean isFileExists = isFileExists(sourcePath);
         Log.d(TAG, "checkDefaultFilePath: isFileExists = " + isFileExists);
         if (!isFileExists) {

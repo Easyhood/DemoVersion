@@ -1,5 +1,6 @@
 package com.mssm.demoversion.download;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -21,9 +22,9 @@ public class SingleDownload {
     public int singleTaskId = 0;
     String apkUrl = "http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk";
     String singleFileSaveName = "liulishuo.apk";
-    public String mSinglePath = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save"
+    public String mSinglePath = Environment.getExternalStorageDirectory() + "/MSSMDownload"
             + File.separator + singleFileSaveName;
-    public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
+    public String mSaveFolder = Environment.getExternalStorageDirectory() + "/MSSMDownload";
 
     public void start_single() {
 

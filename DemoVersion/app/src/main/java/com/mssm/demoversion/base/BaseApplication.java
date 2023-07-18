@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
+import com.liulishuo.filedownloader.services.DownloadMgrInitialParams;
 
 import me.jessyan.autosize.AutoSize;
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
@@ -45,7 +46,7 @@ public class BaseApplication extends Application {
 
 
     private void initFileDownload() {
-        FileDownloader.setupOnApplicationOnCreate(this)
+        FileDownloader.setupOnApplicationOnCreate(getInstances())
                 .connectionCreator(new FileDownloadUrlConnection
                         .Creator(new FileDownloadUrlConnection.Configuration()
                         .connectTimeout(15_000) // set connection timeout.

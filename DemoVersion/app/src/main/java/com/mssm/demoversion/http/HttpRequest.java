@@ -1,10 +1,20 @@
 package com.mssm.demoversion.http;
 
+import static com.mssm.demoversion.util.Constant.BIG_FILE_URLS;
+
+import android.os.Environment;
 import android.util.Log;
 
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.FileDownloader;
+import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
 import com.mssm.demoversion.util.Utils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,7 +30,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HttpRequest {
     private static final String TAG = "HttpRequest";
 
-    public static void requestAdvertisePlan() {
+    private MultiDownload mMultiDownload;
+
+    private final List<BaseDownloadTask> mTask;
+
+    public HttpRequest() {
+        mMultiDownload = new MultiDownload();
+        mTask = new ArrayList<>();
+        mTask.clear();
+    }
+    /**
+     * 请求广告播放计划
+     */
+    public void requestAdvertisePlan() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(AdvertiseInterface.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -35,8 +57,9 @@ public class HttpRequest {
             @Override
             public void onResponse(Call<AdvertiseModel> call, Response<AdvertiseModel> response) {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
-                AdvertiseModel data = response.body();
-                Log.d(TAG, "onResponse: data = " + data.toString());
+                AdvertiseModel model = response.body();
+                Log.d(TAG, "onResponse: model = " + model.toString());
+                startMultiDownload(model);
             }
 
             @Override
@@ -44,5 +67,30 @@ public class HttpRequest {
                 Log.d(TAG, "onFailure: Error ! Cause by " + t);
             }
         });
+    }
+
+    /**
+     * 开始多任务下载
+     * @param model 广告实体对象
+     */
+    public void startMultiDownload(AdvertiseModel model) {
+        for (int i = 0; i < model.getData().size(); i++) {
+            for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
+                String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
+                String filePath = model.getData().get(i).getAdMaterials().get(j).getAdFilePath();
+                analyzeFileParam(fileType, filePath);
+            }
+        }
+    mMultiDownload.start_multi(mTask);
+    }
+
+
+    public void analyzeFileParam(String fileType, String filePath) {
+        StringBuffer sb = new StringBuffer();
+        String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
+        BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
+                .setPath(MultiDownload.mSaveFolder, true);
+        mTask.add(task);
+
     }
 }
