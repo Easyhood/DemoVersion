@@ -21,6 +21,7 @@ import com.mssm.demoversion.presenter.DownloadCompletedListener;
 import com.mssm.demoversion.services.DaemonService;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.util.cache.PreloadManager;
 import com.mssm.demoversion.view.Advance;
@@ -39,13 +40,20 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
 
     private static final String TAG = "AdvertisePlayActivity";
 
-
+    private List<Advance> data = new ArrayList<>();
 
     private AdvanceView mViewPager;
 
     private Context mContext;
 
     private HttpRequest httpRequest;
+
+    // 循环请求变量声明
+    private Handler cycleHandler;
+    private Runnable cycleRunnable;
+
+    //  首次打开应用
+    private boolean isFirstOpen;
 
     public Handler mHandler = new Handler(Looper.myLooper()){
         @Override
@@ -73,23 +81,30 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         setContentView(R.layout.activity_advertise_play);
         CallBackUtils.setListener(this);
         mContext = getApplicationContext();
+        isFirstOpen = true;
+        httpRequest = new HttpRequest();
+        cycleHandler = new Handler();
         StatusBarUtil.setTranslucentForImageView(this, 0, null);
         Utils.checkPermission(this);
         Utils.hideActionBar(this);
         initView();
         initData();
-        httpRequest = new HttpRequest();
-        httpRequest.requestAdvertisePlan();
         Intent intent = new Intent(this, DaemonService.class);
         startForegroundService(intent);
     }
-
-    private final List<Advance> data = new ArrayList<>();
 
     /**
      * 初始化数据
      */
     private void initData() {
+        initDefaultData();
+        startCycleRequest();
+    }
+
+    /**
+     * 初始化默认数据
+     */
+    private void initDefaultData() {
         data.clear();
         addAdvancePhotoData("mspg_1.jpg", R.raw.mspg_1, mContext);
         addAdvancePhotoData("mspg_2.jpg", R.raw.mspg_2, mContext);
@@ -104,6 +119,34 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     }
 
     /**
+     * 开始循环请求线程
+     */
+    private void startCycleRequest() {
+        cycleRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isFirstOpen){
+                    SharedPreferencesUtils.putString(getApplicationContext(), Constant.AD_UUID_KEY,
+                            Constant.AD_UUID_KEY);
+                    isFirstOpen = false;
+                }
+                httpRequest.requestAdvertisePlan();
+                cycleHandler.postDelayed(cycleRunnable, Constant.DELAY_MILLIS);
+            }
+        };
+        cycleHandler.post(cycleRunnable);
+    }
+    /**
+     * 初始化下载数据
+     */
+    public void initDownloadData(){
+        Log.d(TAG, "initDownloadData");
+        data.clear();
+        data = httpRequest.getData();
+        mViewPager.setData(data);
+    }
+
+    /**
      * 加入到Advance照片数据中
      *
      * @param sourcePath 文件名称
@@ -114,7 +157,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
-            Advance advance = new Advance(path, "2");
+            Advance advance = new Advance(path, Constant.IMAGE_INDEX);
             data.add(advance);
         }
     }
@@ -130,17 +173,9 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
-            Advance advance = new Advance(path, "1");
+            Advance advance = new Advance(path, Constant.VIDEO_INDEX);
             data.add(advance);
         }
-    }
-
-    public void initDownloadData(){
-        Log.d(TAG, "initDownloadData");
-        data.clear();
-        addAdvancePhotoData("mspg_6.jpg", R.raw.mspg_6, mContext);
-        addAdvanceVideoData("mssm_1.mp4", R.raw.mssm_1, mContext);
-        mViewPager.setData(data);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -179,6 +214,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         mViewPager.setDestroy();
         PreloadManager.getInstance(this).removeAllPreloadTask();
         mHandler.removeCallbacksAndMessages(null);
+        cycleHandler.removeCallbacks(cycleRunnable);
         Intent intent = new Intent(Constant.ACTION_DESTROYED);
         sendBroadcast(intent);
     }

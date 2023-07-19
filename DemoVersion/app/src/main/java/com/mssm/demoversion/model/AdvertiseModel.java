@@ -142,6 +142,10 @@ public class AdvertiseModel {
         @SerializedName("file_md5")
         private String fileMD5;
 
+        // 素材名
+        @SerializedName("file_name")
+        private String fileName;
+
         // 素材文件路径
         @SerializedName("ad_file_path")
         private String adFilePath;
@@ -154,7 +158,7 @@ public class AdvertiseModel {
         @SerializedName("created_at")
         private String matCreatedAt;
 
-        // 素材创建时间
+        // 素材更新时间
         @SerializedName("updated_at")
         private String matUpdatedAt;
 
@@ -180,6 +184,10 @@ public class AdvertiseModel {
 
         public String getFileMD5() {
             return fileMD5;
+        }
+
+        public String getFileName() {
+            return fileName;
         }
 
         public String getAdFilePath() {
@@ -210,6 +218,7 @@ public class AdvertiseModel {
                     ", matType='" + matType + '\'' +
                     ", fileSize=" + fileSize +
                     ", fileMD5='" + fileMD5 + '\'' +
+                    ", fileName='" + fileName + '\'' +
                     ", adFilePath='" + adFilePath + '\'' +
                     ", mgrUserUUID='" + mgrUserUUID + '\'' +
                     ", matCreatedAt='" + matCreatedAt + '\'' +

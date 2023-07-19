@@ -1,7 +1,5 @@
 package com.mssm.demoversion.download;
 
-import static com.mssm.demoversion.util.Constant.BIG_FILE_URLS;
-
 import android.os.Environment;
 import android.util.Log;
 
@@ -11,11 +9,10 @@ import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
-import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.util.CallBackUtils;
+import com.mssm.demoversion.util.Constant;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,7 +63,7 @@ public class MultiDownload {
                         + task.getSpeed() + ",isReuse:" + task.reuse());
                 mTaskCount --;
                 Log.d(TAG, "blockComplete: mTaskCount = " + mTaskCount);
-                if (mTaskCount == 0) {
+                if (mTaskCount == Constant.INDEX_0) {
                     completed(task);
                 }
             }

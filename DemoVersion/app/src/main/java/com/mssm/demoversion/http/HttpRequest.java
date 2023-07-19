@@ -1,18 +1,19 @@
 package com.mssm.demoversion.http;
 
-import static com.mssm.demoversion.util.Constant.BIG_FILE_URLS;
-
-import android.os.Environment;
+import android.content.Context;
 import android.util.Log;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloader;
+import com.mssm.demoversion.base.BaseApplication;
 import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
+import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
+import com.mssm.demoversion.view.Advance;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +35,15 @@ public class HttpRequest {
 
     private final List<BaseDownloadTask> mTask;
 
+    private final List<Advance> mData;
+
+    private Context mContext;
+
     public HttpRequest() {
+        mContext = BaseApplication.getInstances().getApplicationContext();
         mMultiDownload = new MultiDownload();
         mTask = new ArrayList<>();
+        mData = new ArrayList<>();
         mTask.clear();
     }
     /**
@@ -59,7 +66,20 @@ public class HttpRequest {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
                 AdvertiseModel model = response.body();
                 Log.d(TAG, "onResponse: model = " + model.toString());
-                startMultiDownload(model);
+                String planId = model.getData().get(Constant.INDEX_0).getPlanId();
+                String spPlanId = SharedPreferencesUtils.getString(mContext, Constant.AD_UUID_KEY);
+                if (planId == null || spPlanId == null) {
+                    Log.d(TAG, "onResponse: planId or spPlanId is null");
+                    return;
+                }
+                if (!planId.equals(spPlanId)){
+                    Log.d(TAG, "onResponse: startMultiDownload ");
+                    startMultiDownload(model);
+                    SharedPreferencesUtils.putString(mContext, Constant.AD_UUID_KEY, planId);
+                } else {
+                    Log.d(TAG, "onResponse: Not download Cause planId is same as spPlanId : "
+                            + planId);
+                }
             }
 
             @Override
@@ -74,6 +94,7 @@ public class HttpRequest {
      * @param model 广告实体对象
      */
     public void startMultiDownload(AdvertiseModel model) {
+        mData.clear();
         for (int i = 0; i < model.getData().size(); i++) {
             for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
                 String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
@@ -85,12 +106,30 @@ public class HttpRequest {
     }
 
 
+    /**
+     * 处理文件参数
+     * @param fileType 文件类型
+     * @param filePath 文件路径
+     */
     public void analyzeFileParam(String fileType, String filePath) {
         StringBuffer sb = new StringBuffer();
         String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
         BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
                 .setPath(MultiDownload.mSaveFolder, true);
         mTask.add(task);
+        String localPath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
+        if (Constant.IMAGE_TYPE.equals(fileType)) {
+            Advance imageAdvance = new Advance(localPath, Constant.IMAGE_INDEX);
+            mData.add(imageAdvance);
+        } else if (Constant.VIDEO_TYPE.equals(fileType)) {
+            Advance videoAdvance = new Advance(localPath, Constant.VIDEO_INDEX);
+            mData.add(videoAdvance);
+        } else {
+            Log.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
+        }
+    }
 
+    public List<Advance> getData () {
+        return mData;
     }
 }

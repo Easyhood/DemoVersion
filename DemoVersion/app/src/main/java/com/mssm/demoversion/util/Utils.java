@@ -78,13 +78,30 @@ public class Utils {
     }
 
     /**
-     * 判断某个文件是否存在
+     * 判断默认某个文件是否存在
      *
      * @param sourcePath 文件绝对路径
      * @return 文件是否存在
      */
-    public static boolean isFileExists(String sourcePath) {
+    public static boolean isDefaultFileExists(String sourcePath) {
         File file = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
+        if (!file.getParentFile().exists()) {
+            return false;
+        }
+        if (file.exists()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断下载的某个文件是否存在
+     *
+     * @param sourcePath 文件绝对路径
+     * @return 文件是否存在
+     */
+    public static boolean isDownloadFileExists(String sourcePath) {
+        File file = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload", sourcePath);
         if (!file.getParentFile().exists()) {
             return false;
         }
@@ -165,13 +182,34 @@ public class Utils {
     public static String checkDefaultFilePath(String sourcePath, int rawId, Context context) {
         String path = null;
         File dstFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
-        boolean isFileExists = isFileExists(sourcePath);
+        boolean isFileExists = isDefaultFileExists(sourcePath);
         Log.d(TAG, "checkDefaultFilePath: isFileExists = " + isFileExists);
         if (!isFileExists) {
             path = copyRawFileToExDir(sourcePath, rawId, context);
         } else {
             path = dstFile.getAbsolutePath();
         }
+        return path;
+    }
+
+    /**
+     * 检查下载文件路径
+     *
+     * @param sourcePath 文件名
+     * @return 文件路径
+     */
+    public static String checkDownloadFilePath(String sourcePath) {
+        String path = null;
+        File downloadFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload", sourcePath);
+        boolean isFileExists = isDownloadFileExists(sourcePath);
+        Log.d(TAG, "checkDownloadFilePath: isFileExists = " + isFileExists);
+        if (!isFileExists) {
+            File parentDir = downloadFile.getParentFile();
+            if (!parentDir.exists()) {
+                parentDir.mkdir();
+            }
+        }
+        path = downloadFile.getAbsolutePath();
         return path;
     }
 
@@ -222,6 +260,13 @@ public class Utils {
         // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
         // serialNumber = yfapiManager.yfgetSerialNumber();
         return serialNumberStr;
+    }
+
+    public static String getFileName(String sourcePath){
+        String mFileName = "";
+        int index = sourcePath.lastIndexOf("/");
+        mFileName = sourcePath.substring(index + 1);
+        return mFileName;
     }
 
 }
