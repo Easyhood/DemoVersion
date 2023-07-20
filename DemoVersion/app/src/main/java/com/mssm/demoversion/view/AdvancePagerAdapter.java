@@ -30,7 +30,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     private List<View> list = new ArrayList<>();
 
     private int current = 0;
-    private int time = 3000;
+    private int time = 1000;
     private boolean pause;
     private Thread thread;
 
@@ -57,6 +57,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
             if (advances.get(i).type.equals("1")) {
                 mPreloadManager.addPreloadTask(advances.get(i).path, i);
             }
+            time = (int) advances.get(i).playTime;
         }
         if (isRunning) {
             if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {

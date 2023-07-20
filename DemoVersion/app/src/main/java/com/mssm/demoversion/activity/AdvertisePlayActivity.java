@@ -157,7 +157,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
-            Advance advance = new Advance(path, Constant.IMAGE_INDEX);
+            Advance advance = new Advance(path, Constant.IMAGE_INDEX,0);
             data.add(advance);
         }
     }
@@ -173,7 +173,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
         Log.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
-            Advance advance = new Advance(path, Constant.VIDEO_INDEX);
+            Advance advance = new Advance(path, Constant.VIDEO_INDEX, 5000);
             data.add(advance);
         }
     }

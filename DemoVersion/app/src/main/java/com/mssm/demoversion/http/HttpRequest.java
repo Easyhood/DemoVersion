@@ -103,7 +103,9 @@ public class HttpRequest {
             for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
                 String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
                 String filePath = model.getData().get(i).getAdMaterials().get(j).getAdFilePath();
-                analyzeFileParam(fileType, filePath);
+                int playTime = model.getData().get(i).getAdMaterials().get(j).getPlayTime();
+                int filePlayTime = playTime * 1000;
+                analyzeFileParam(fileType, filePath, filePlayTime);
             }
         }
     mMultiDownload.start_multi(mTask);
@@ -115,7 +117,9 @@ public class HttpRequest {
      * @param fileType 文件类型
      * @param filePath 文件路径
      */
-    public void analyzeFileParam(String fileType, String filePath) {
+    public void analyzeFileParam(String fileType, String filePath, int filePlayTime) {
+        Log.d(TAG, "analyzeFileParam: fileType = " + fileType + " , filePlayTime = "
+                        + filePlayTime + " , filePath = " + filePath);
         StringBuffer sb = new StringBuffer();
         String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
         BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
@@ -123,16 +127,15 @@ public class HttpRequest {
         mTask.add(task);
         String localPath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
         if (Constant.IMAGE_TYPE.equals(fileType)) {
-            Advance imageAdvance = new Advance(localPath, Constant.IMAGE_INDEX);
+            Advance imageAdvance = new Advance(localPath, Constant.IMAGE_INDEX, filePlayTime);
             mData.add(imageAdvance);
         } else if (Constant.VIDEO_TYPE.equals(fileType)) {
-            Advance videoAdvance = new Advance(localPath, Constant.VIDEO_INDEX);
+            Advance videoAdvance = new Advance(localPath, Constant.VIDEO_INDEX, filePlayTime);
             mData.add(videoAdvance);
         } else {
             Log.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
         }
     }
-
     public List<Advance> getData () {
         return mData;
     }

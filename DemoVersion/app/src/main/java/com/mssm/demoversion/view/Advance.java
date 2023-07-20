@@ -7,8 +7,10 @@ package com.mssm.demoversion.view;
  **/
 public class Advance {
 
-    public String path;//路径  我使用的是本地绝对路径
-    public String type;//类型 1、视频 2、图片
+    public String path;// 路径  我使用的是本地绝对路径
+    public String type;// 类型 1、视频 2、图片
+
+    public long playTime;// 播放时间
 
     /**
      * 播放实体类
@@ -16,8 +18,9 @@ public class Advance {
      * @param path 路径  我使用的是本地绝对路径
      * @param type 类型 1、视频 2、图片
      */
-    public Advance(String path, String type) {
+    public Advance(String path, String type, int playTime) {
         this.path = path;
         this.type = type;
+        this.playTime = playTime;
     }
 }
