@@ -33,18 +33,15 @@ public class HttpRequest {
 
     private MultiDownload mMultiDownload;
 
-    private final List<BaseDownloadTask> mTask;
+    private List<BaseDownloadTask> mTask;
 
-    private final List<Advance> mData;
+    private List<Advance> mData;
 
     private Context mContext;
 
     public HttpRequest() {
         mContext = BaseApplication.getInstances().getApplicationContext();
         mMultiDownload = new MultiDownload();
-        mTask = new ArrayList<>();
-        mData = new ArrayList<>();
-        mTask.clear();
     }
     /**
      * 请求广告播放计划
@@ -65,6 +62,10 @@ public class HttpRequest {
             public void onResponse(Call<AdvertiseModel> call, Response<AdvertiseModel> response) {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
                 AdvertiseModel model = response.body();
+                if (model.getData() == null) {
+                    Log.d(TAG, "onResponse: model.getData() is null");
+                    return;
+                }
                 Log.d(TAG, "onResponse: model = " + model.toString());
                 String planId = model.getData().get(Constant.INDEX_0).getPlanId();
                 String spPlanId = SharedPreferencesUtils.getString(mContext, Constant.AD_UUID_KEY);
@@ -94,6 +95,9 @@ public class HttpRequest {
      * @param model 广告实体对象
      */
     public void startMultiDownload(AdvertiseModel model) {
+        mTask = new ArrayList<>();
+        mData = new ArrayList<>();
+        mTask.clear();
         mData.clear();
         for (int i = 0; i < model.getData().size(); i++) {
             for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
