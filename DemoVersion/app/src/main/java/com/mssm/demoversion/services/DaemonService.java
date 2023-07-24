@@ -26,13 +26,14 @@ import com.mssm.demoversion.util.Utils;
  * @desciption 守护进程服务
  * @since 2023/7/14
  **/
-public class DaemonService extends Service {
+public class DaemonService extends Service{
 
     private static final String TAG = "DaemonService";
 
     private static final int NOTIFICATION_ID = 1;
     private String channelId = "null";
     private DestroyReceiver destroyReceiver;
+
     private Handler handler;
 
     public DaemonService() {
@@ -62,7 +63,10 @@ public class DaemonService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ACTION_DESTROYED);
         registerReceiver(destroyReceiver, filter);
+
     }
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

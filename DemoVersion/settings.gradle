@@ -7,6 +7,7 @@ pluginManagement {
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://repo.huaweicloud.com/repository/maven/' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://repo.eclipse.org/content/repositories/paho-snapshots/" }
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://repo.huaweicloud.com/repository/maven/' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://repo.eclipse.org/content/repositories/paho-snapshots/" }
         google()
         mavenCentral()
 

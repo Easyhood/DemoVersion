@@ -19,6 +19,7 @@ import com.mssm.demoversion.R;
 import com.mssm.demoversion.http.HttpRequest;
 import com.mssm.demoversion.presenter.DownloadCompletedListener;
 import com.mssm.demoversion.services.DaemonService;
+import com.mssm.demoversion.services.MsMqttService;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
@@ -27,7 +28,6 @@ import com.mssm.demoversion.util.cache.PreloadManager;
 import com.mssm.demoversion.view.Advance;
 import com.mssm.demoversion.view.AdvanceView;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +90,14 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         initView();
         initData();
         Intent intent = new Intent(this, DaemonService.class);
+        startForegroundService(intent);
+        startMqttService();
+    }
+
+
+    private void startMqttService() {
+        Intent intent = new Intent(this, MsMqttService.class);
+        //bindService(intent, mqttServiceConnection, Context.BIND_AUTO_CREATE);
         startForegroundService(intent);
     }
 
