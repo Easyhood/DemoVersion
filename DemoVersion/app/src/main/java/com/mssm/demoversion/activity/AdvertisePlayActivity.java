@@ -228,10 +228,12 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     }
 
     @Override
-    public void completedCallback() {
-        Log.d(TAG, "completedCallback MultiDownload");
-        Message message = new Message();
-        message.what = Constant.DOWNLOAD_COMPLETED;
-        mHandler.sendMessageDelayed(message, Constant.DELAY_TIMES);
+    public void completedCallback(int tag) {
+        Log.d(TAG, "completedCallback MultiDownload tag = " + tag);
+        if (Constant.ADVERTISE_DOWNLOAD == tag) {
+            Message message = new Message();
+            message.what = Constant.DOWNLOAD_COMPLETED;
+            mHandler.sendMessageDelayed(message, Constant.DELAY_TIMES);
+        }
     }
 }

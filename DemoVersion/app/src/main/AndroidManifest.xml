@@ -27,13 +27,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MssmDeoversion"
         tools:targetApi="31">
+
         <service
             android:name=".services.MsMqttService"
             android:enabled="true"
             android:exported="true"
-            android:process=":msmqtt_service">
-
-        </service>
+            android:process=":msmqtt_service"/>
         <service
             android:name=".services.DaemonService"
             android:enabled="true"
@@ -68,6 +67,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.ScanQRCodeActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

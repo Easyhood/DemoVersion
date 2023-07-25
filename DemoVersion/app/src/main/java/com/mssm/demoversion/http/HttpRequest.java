@@ -108,7 +108,7 @@ public class HttpRequest {
                 analyzeFileParam(fileType, filePath, filePlayTime);
             }
         }
-    mMultiDownload.start_multi(mTask);
+    mMultiDownload.start_multi(mTask, Constant.ADVERTISE_DOWNLOAD);
     }
 
 

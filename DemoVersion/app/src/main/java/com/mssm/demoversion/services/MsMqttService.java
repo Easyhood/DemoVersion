@@ -17,9 +17,18 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.google.gson.Gson;
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.mssm.demoversion.R;
+import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.activity.ScanQRCodeActivity;
+import com.mssm.demoversion.download.MultiDownload;
+import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.model.MqttModel;
-import com.mssm.demoversion.model.MqttTestModel;
+import com.mssm.demoversion.presenter.DownloadCompletedListener;
+import com.mssm.demoversion.util.CallBackUtils;
+import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.Utils;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -29,22 +38,33 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
-public class MsMqttService extends Service {
+/**
+ * @author Easyhood
+ * @desciption MQTT服务进程
+ * @since 2023/7/14
+ **/
+public class MsMqttService extends Service implements DownloadCompletedListener {
 
     private static final String TAG = "MsMqttService";
     private static final int NOTIFICATION_ID = 1001;
-    public static MqttTestModel mqttTestModel;
+    public MqttModel mqttModel;
 
     private String channelId = "null";
     private Handler handler;
     private MqttClient client;
     private MqttConnectOptions options;
+    private MultiDownload mMultiDownload;
     private ScheduledExecutorService scheduler;
+    private String messageJson;
+    private List<BaseDownloadTask> mTask;
+    private String localtopBgPath;
+    private String localtopFloatPath;
 
     //这些都写你自己的或者找个测试的地址
     private String host = "TCP://test-mqtt.woozatop.com:1883";     // TCP协议
@@ -55,6 +75,14 @@ public class MsMqttService extends Service {
     private String mqtt_pub_topic = "well/1123/0";//mqtt你发布的主题的标识
 
     public MsMqttService() {
+    }
+
+    public MqttModel getMqttModel() {
+        return mqttModel;
+    }
+
+    public void setMqttModel(MqttModel mqttModel) {
+        this.mqttModel = mqttModel;
     }
 
     /**
@@ -69,14 +97,29 @@ public class MsMqttService extends Service {
         }
 
         @Override
-        public void messageArrived(String topic, MqttMessage message) throws Exception {
+        public void messageArrived(String topic, MqttMessage message) {
             //subscribe后得到的消息会执行到这里面
             Log.d(TAG, "messageArrived: subscribe后得到的消息 : " + message);
-            Gson gson = new Gson();
-            String messageJson = String.valueOf(message.toString().toCharArray());
-            Log.d(TAG, "messageArrived: messageJson = " + messageJson);
-            mqttTestModel = gson.fromJson(messageJson, MqttTestModel.class);
-            Log.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttTestModel.getCmdStr());
+            try {
+                Gson gson = new Gson();
+                messageJson = String.valueOf(message.toString().toCharArray());
+                messageJson = messageJson.replaceAll("\\s|\\n", "");
+                Log.d(TAG, "messageArrived: messageJson = " + messageJson);
+                mqttModel = gson.fromJson(messageJson, MqttModel.class);
+                setMqttModel(mqttModel);
+                Log.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
+                if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
+                    startResMultiDownload(mqttModel);
+                } else if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
+                    startAdvertisePlayActivity(getApplicationContext());
+                } else {
+                    Log.d(TAG, "messageArrived: mqttModel.getCmdStr() is new");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d(TAG, "messageArrived: e = " + e);
+            }
+
         }
 
         @Override
@@ -89,6 +132,7 @@ public class MsMqttService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        CallBackUtils.setListener(this);
         // 8.0 以上需要特殊处理
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channelId = createNotificationChannel("com.mssm.mqtt", "MQTTForegroundService");
@@ -103,6 +147,7 @@ public class MsMqttService extends Service {
                 .build();
         // make the service foreground
         startForeground(NOTIFICATION_ID, notification);
+        mMultiDownload = new MultiDownload();
         mqttInit();
     }
 
@@ -196,6 +241,7 @@ public class MsMqttService extends Service {
 
     /**
      * 判断网络是否连接
+     *
      * @return isConnectIsNormal
      */
     private boolean isConnectIsNormal() {
@@ -238,5 +284,64 @@ public class MsMqttService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void completedCallback(int tag) {
+        Log.d(TAG, "completedCallback: tag = " + tag);
+        if (Constant.SCANQRCODE_DOWNLOAD == tag) {
+            Log.d(TAG, "completedCallback: 二维码下载完成后跳转");
+            startToScanQRCode(getApplicationContext());
+        }
+    }
+
+    /**
+     * 跳转到二维码扫描互动界面
+     *
+     * @param context Context
+     */
+    private void startToScanQRCode(Context context) {
+        Intent intent = new Intent(context, ScanQRCodeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("bean", messageJson);
+        intent.putExtra("localtopBgPath", localtopBgPath);
+        intent.putExtra("localtopFloatPath", localtopFloatPath);
+        startActivity(intent);
+    }
+
+    /**
+     * 启动广播轮播界面，需要检测栈顶activity是否该界面，防止重复启动
+     *
+     * @param context Context
+     */
+    private void startAdvertisePlayActivity(Context context) {
+        String topActivityName = Utils.getTopActivityName(context);
+        Log.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
+        if (!AdvertisePlayActivity.class.getName().equals(topActivityName)) {
+            Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
+            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(activityIntent);
+        }
+    }
+
+    /**
+     * 开始多任务下载
+     * @param model 广告实体对象
+     */
+    private void startResMultiDownload(MqttModel model) {
+        Log.d(TAG, "startResMultiDownload");
+        mTask = new ArrayList<>();
+        mTask.clear();
+        String topBgHttpUrlPath = model.getTopLayerModel().getTopBgImageModel().getResUrl();
+        localtopBgPath = Utils.checkDownloadFilePath(Utils.getFileName(topBgHttpUrlPath));
+        BaseDownloadTask topBgHttpUrlTask = FileDownloader.getImpl().create(topBgHttpUrlPath)
+                .setPath(MultiDownload.mSaveFolder, true);
+        mTask.add(topBgHttpUrlTask);
+        String topFloatHttpUrlPath = model.getTopLayerModel().getTopFloatImgModel().getResUrl();
+        localtopFloatPath = Utils.checkDownloadFilePath(Utils.getFileName(topFloatHttpUrlPath));
+        BaseDownloadTask topFloatHttpUrlTask = FileDownloader.getImpl().create(topFloatHttpUrlPath)
+                .setPath(MultiDownload.mSaveFolder, true);
+        mTask.add(topFloatHttpUrlTask);
+        mMultiDownload.start_multi(mTask, Constant.SCANQRCODE_DOWNLOAD);
     }
 }

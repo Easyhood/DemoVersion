@@ -6,5 +6,5 @@ package com.mssm.demoversion.presenter;
  * @since 2023/7/18
  **/
 public interface DownloadCompletedListener {
-    public void completedCallback();
+    public void completedCallback(int tag);
 }

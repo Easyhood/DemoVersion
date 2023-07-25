@@ -30,7 +30,7 @@ public class MultiDownload {
     //public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
     public static String mSaveFolder = Environment.getExternalStorageDirectory() + "/MSSMDownload";
 
-    public FileDownloadListener createLis() {
+    public FileDownloadListener createLis(int tag) {
         return new FileDownloadSampleListener() {
             @Override
             protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
@@ -71,7 +71,7 @@ public class MultiDownload {
             @Override
             protected void completed(BaseDownloadTask task) {
                 Log.d(TAG, "completed");
-                CallBackUtils.doCallBackMethod();
+                CallBackUtils.doCallBackMethod(tag);
                 if (task.getListener() != downloadListener) {
                     return;
                 }
@@ -105,9 +105,9 @@ public class MultiDownload {
         };
     }
 
-    public void start_multi(final List<BaseDownloadTask> tasks) {
+    public void start_multi(List<BaseDownloadTask> tasks, int tag) {
 
-        downloadListener = createLis();
+        downloadListener = createLis(tag);
         //(1) 创建 FileDownloadQueueSet
         final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
 

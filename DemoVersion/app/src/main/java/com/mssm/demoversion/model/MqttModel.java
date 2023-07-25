@@ -25,15 +25,11 @@ public class MqttModel {
 
     // 背景布局数据列表
     @SerializedName("bg_layer")
-    public List<BgLayerModel> bgLayer;
+    public BgLayerModel bgLayerModel;
 
     // 顶层布局数据列表
     @SerializedName("top_layer")
-    public List<TopLayerModel> topLayer;
-
-    // 顶层二层布局数据列表
-    @SerializedName("top_float_img")
-    public List<TopFloatImgModel> topFloatImg;
+    public TopLayerModel topLayerModel;
 
     public String getCmdStr() {
         return cmdStr;
@@ -47,16 +43,12 @@ public class MqttModel {
         return eventUUID;
     }
 
-    public List<BgLayerModel> getBgLayer() {
-        return bgLayer;
+    public BgLayerModel getBgLayerModel() {
+        return bgLayerModel;
     }
 
-    public List<TopLayerModel> getTopLayer() {
-        return topLayer;
-    }
-
-    public List<TopFloatImgModel> getTopFloatImg() {
-        return topFloatImg;
+    public TopLayerModel getTopLayerModel() {
+        return topLayerModel;
     }
 
     @Override
@@ -65,9 +57,8 @@ public class MqttModel {
                 "cmdStr='" + cmdStr + '\'' +
                 ", displayTime=" + displayTime +
                 ", eventUUID='" + eventUUID + '\'' +
-                ", bgLayer=" + bgLayer +
-                ", topLayer=" + topLayer +
-                ", topFloatImg=" + topFloatImg +
+                ", bgLayerModel=" + bgLayerModel +
+                ", topLayerModel=" + topLayerModel +
                 '}';
     }
 
@@ -107,16 +98,25 @@ public class MqttModel {
     public static class TopLayerModel {
         // 顶层布局背景图片列表
         @SerializedName("top_bg_img")
-        public List<TopBgImageModel> data;
+        public TopBgImageModel topBgImageModel;
 
-        public List<TopBgImageModel> getData() {
-            return data;
+        // 顶层二层布局数据列表
+        @SerializedName("top_float_img")
+        public TopFloatImgModel topFloatImgModel;
+
+        public TopBgImageModel getTopBgImageModel() {
+            return topBgImageModel;
+        }
+
+        public TopFloatImgModel getTopFloatImgModel() {
+            return topFloatImgModel;
         }
 
         @Override
         public String toString() {
             return "TopLayerModel{" +
-                    "data=" + data +
+                    "topBgImageModel=" + topBgImageModel +
+                    ", topFloatImgModel=" + topFloatImgModel +
                     '}';
         }
     }

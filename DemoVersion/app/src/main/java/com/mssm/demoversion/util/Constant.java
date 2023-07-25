@@ -13,6 +13,12 @@ public class Constant {
     // 广告UUID key
     public static final String AD_UUID_KEY = "AD_UUID_KEY";
 
+    // 请求类型
+    // 广告页面下载请求
+    public static final int ADVERTISE_DOWNLOAD = 10001;
+    // 二维码互动页面下载请求
+    public static final int SCANQRCODE_DOWNLOAD = 10002;
+
     // 图片类型
     public static final String IMAGE_TYPE = "image";
     public static final String IMAGE_INDEX = "2";
@@ -31,7 +37,13 @@ public class Constant {
     // 下载完成
     public static final int DOWNLOAD_COMPLETED = 1;
 
-    public static final long DELAY_MILLIS = 30000L;
+    public static final long DELAY_MILLIS = 32000L;
+
+    // 扫码通知标识
+    // 扫码播放标识
+    public static final String DISPLAY_RT_EVENT = "DISPLAY_RT_EVENT";
+    // 扫码播放停止标识
+    public static final String END_RT_EVENT = "END_RT_EVENT";
 
     // 数字索引
     public static final int INDEX_0 = 0;

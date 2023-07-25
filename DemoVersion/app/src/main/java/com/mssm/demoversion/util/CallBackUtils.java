@@ -18,7 +18,7 @@ public class CallBackUtils {
         mListener = listener;
     }
 
-    public static void doCallBackMethod() {
-        mListener.completedCallback();
+    public static void doCallBackMethod(int tag) {
+        mListener.completedCallback(tag);
     }
 }
