@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.services.MsMqttService;
+import com.mssm.demoversion.view.TimerTextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +47,9 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     // 二维码图片
     private ImageView ivQrCode;
+
+    // 倒计时
+    private TimerTextView tvTimer;
 
     // meidiaplayer对象
     private MediaPlayer mediaPlayer;
@@ -89,6 +93,9 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         rlScanQRCode= findViewById(R.id.rl_scanqrcode);
         ivQrCodeBg = findViewById(R.id.iv_qrcodebg);
         ivQrCode = findViewById(R.id.iv_qrcode);
+        tvTimer = findViewById(R.id.tv_timer);
+        tvTimer.setTimes(32L);
+        tvTimer.beginRun();
         initTopBgImage();
         initScanQRCodeImage();
         // 设置点击事件
@@ -258,6 +265,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        tvTimer.stopRun();
         mediaPlayer.stop();
         mediaPlayer.release();
     }
