@@ -92,14 +92,14 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         @Override
         public void connectionLost(Throwable cause) {
             //连接丢失后，一般在这里面进行重连
-            Log.d(TAG, "connectionLost: 连接丢失");
+            Log.d(TAG, "connectionLost : " + getString(R.string.mqtt_connect_lost));
             startReconnect();
         }
 
         @Override
         public void messageArrived(String topic, MqttMessage message) {
             //subscribe后得到的消息会执行到这里面
-            Log.d(TAG, "messageArrived: subscribe后得到的消息 : " + message);
+            Log.d(TAG, "messageArrived "+ getString(R.string.mqtt_subscribe_message) +" : " + message);
             try {
                 Gson gson = new Gson();
                 messageJson = String.valueOf(message.toString().toCharArray());
@@ -124,7 +124,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
-            //publish后会执行到这里
+            // publish后会执行到这里
             Log.d(TAG, "deliveryComplete: publish后会执行 =" + token.isComplete());
         }
     };
@@ -135,7 +135,8 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         CallBackUtils.setListener(this);
         // 8.0 以上需要特殊处理
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channelId = createNotificationChannel("com.mssm.mqtt", "MQTTForegroundService");
+            channelId = createNotificationChannel("com.mssm.mqtt",
+                    "MQTTForegroundService");
         } else {
             channelId = "";
         }
@@ -190,15 +191,15 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
             public void run() {
                 try {
                     if (!client.isConnected() && isConnectIsNormal()) {
-                        //如果还未连接 开始连接
+                        // 如果还未连接 开始连接
                         // MqttConnectOptions options = null;
                         client.connect(options);
-                        Log.d(TAG, "run: 连接成功");
+                        Log.d(TAG, "run: " + getString(R.string.mqtt_connect_success));
                         client.subscribe(mqtt_sub_topic, 1);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.d(TAG, "run: 连接失败 cause by : " + e);
+                    Log.d(TAG, "run: " + getString(R.string.mqtt_connect_fail) + "cause by : " + e);
                 }
             }
         }).start();
@@ -237,7 +238,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
             e.printStackTrace();
         }
     }
-    /* ========================================================================================== */
 
     /**
      * 判断网络是否连接
@@ -250,10 +250,10 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         if (info != null && info.isAvailable()) {
             String name = info.getTypeName();
-            Log.i(TAG, "MQTT当前网络名称：" + name);
+            Log.i(TAG, getString(R.string.mqtt_network_name) + "：" + name);
             return true;
         } else {
-            Log.i(TAG, "MQTT 没有可用网络");
+            Log.i(TAG, getString(R.string.mqtt_no_network));
             return false;
         }
     }
@@ -290,7 +290,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     public void completedCallback(int tag) {
         Log.d(TAG, "completedCallback: tag = " + tag);
         if (Constant.SCANQRCODE_DOWNLOAD == tag) {
-            Log.d(TAG, "completedCallback: 二维码下载完成后跳转");
+            Log.d(TAG, "completedCallback: " + getString(R.string.mqtt_scancode_download));
             startToScanQRCode(getApplicationContext());
         }
     }

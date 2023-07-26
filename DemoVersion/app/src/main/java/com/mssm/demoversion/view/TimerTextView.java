@@ -7,6 +7,11 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.mssm.demoversion.R;
+import com.mssm.demoversion.base.BaseApplication;
+import com.mssm.demoversion.util.CallBackUtils;
+import com.mssm.demoversion.util.Constant;
+
 /**
  * @author Easyhood
  * @desciption 自定义倒计时view
@@ -52,8 +57,9 @@ public class TimerTextView extends TextView implements Runnable{
      */
     private void ComputeTime() {
         mSecond--;
-        if (mSecond < 0) {
-            mSecond = 0;
+        if (mSecond <= Constant.INDEX_0) {
+            mSecond = Constant.INDEX_0;
+            CallBackUtils.doTimerComputedCallBackMethod(mSecond);
         }
     }
 
@@ -65,11 +71,17 @@ public class TimerTextView extends TextView implements Runnable{
         return isRun;
     }
 
+    /**
+     * 开始运行倒计时
+     */
     public void beginRun() {
         this.isRun = true;
         run();
     }
 
+    /**
+     * 停止倒计时运行
+     */
     public void stopRun(){
         this.isRun = false;
     }
@@ -79,7 +91,7 @@ public class TimerTextView extends TextView implements Runnable{
         //标示已经启动
         if(isRun){
             ComputeTime();
-            String timeStr= "倒计时：" + mSecond;
+            String timeStr= BaseApplication.getInstances().getString(R.string.timer_compute_run) + mSecond;
             this.setText(timeStr);
             postDelayed(this, 1000);
         }else {

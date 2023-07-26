@@ -245,8 +245,8 @@ public class Utils {
         String topActivity = "";
         ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
-        if (taskInfo != null && taskInfo.size() > 0) {
-            topActivity = taskInfo.get(0).topActivity.getClassName();
+        if (taskInfo != null && taskInfo.size() > Constant.INDEX_0) {
+            topActivity = taskInfo.get(Constant.INDEX_0).topActivity.getClassName();
         }
         return topActivity;
     }
@@ -265,7 +265,7 @@ public class Utils {
     public static String getFileName(String sourcePath){
         String mFileName = "";
         int index = sourcePath.lastIndexOf("/");
-        mFileName = sourcePath.substring(index + 1);
+        mFileName = sourcePath.substring(index + Constant.INDEX_1);
         return mFileName;
     }
 

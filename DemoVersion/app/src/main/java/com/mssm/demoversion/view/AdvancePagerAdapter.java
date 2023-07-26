@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.WeakHandler;
 import com.mssm.demoversion.util.cache.PreloadManager;
 
@@ -24,6 +25,9 @@ import xyz.doikki.videoplayer.player.VideoView;
  **/
 public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener,
         BaseVideoView.OnStateChangeListener {
+
+    private static final String TAG = "AdvancePagerAdapter";
+
     private Context context;
     private ViewPager viewPager;
     private List<Advance> datas;
@@ -52,7 +56,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     public void setData(List<Advance> advances) {
 
-        if (advances.size() == 0) return;
+        if (advances.size() == Constant.INDEX_0) return;
         for (int i = 0; i < advances.size(); i++) {
             if (advances.get(i).type.equals("1")) {
                 mPreloadManager.addPreloadTask(advances.get(i).path, i);
@@ -71,8 +75,8 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         viewPager.removeAllViews();
         this.datas = advances;
         list.clear();
-        addView(advances.get(advances.size() - 1));
-        if (advances.size() > 1) { //多于1个要循环
+        addView(advances.get(advances.size() - Constant.INDEX_1));
+        if (advances.size() > Constant.INDEX_1) { //多于1个要循环
             for (Advance d : advances) { //中间的N个（index:1~N）
                 addView(d);
             }
@@ -80,11 +84,11 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         }
         notifyDataSetChanged();
         //在外层，将mViewPager初始位置设置为1即可
-        if (advances.size() > 1) { //多于1个，才循环并开启定时器
+        if (advances.size() > Constant.INDEX_1) { //多于1个，才循环并开启定时器
             viewPager.setCurrentItem(1);
             startNewTimer();
         }
-        if (advances.get(0).type.equals("1")) {//有人反应第一个是视频不播放这边优化了一下
+        if (advances.get(Constant.INDEX_0).type.equals("1")) {//有人反应第一个是视频不播放这边优化了一下
 //            if ( ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView!=null){
 //                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.VISIBLE);
 //            }
@@ -114,7 +118,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     private void stopTimer() {
         isRunning = false;
-        current = 0;
+        current = Constant.INDEX_0;
         lastPosition = -1;
         weakHandler.removeCallbacks(timeRunnable);
     }
@@ -126,8 +130,9 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
                 current += 1000;
             }
             if (current >= time) {
-                viewPager.post(() -> viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true));
-                current = 0;
+                viewPager.post(() -> viewPager.setCurrentItem(viewPager.getCurrentItem() +
+                        Constant.INDEX_1, true));
+                current = Constant.INDEX_0;
             }
             weakHandler.postDelayed(this, 1000);
         }
@@ -146,7 +151,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
                         current += 1000;
                     if (current >= time) {
                         viewPager.post(() -> viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true));
-                        current = 0;
+                        current = Constant.INDEX_0;
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -200,16 +205,16 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     @Override
     public void onPageScrollStateChanged(int state) {
         // 由于viewpager的预加载机制onPageSelected这里面加载videoview 放的跟玩一样  等操作完成后再播放videoview就香了  很丝滑
-        if (state == 0) {
-            if (list.size() > 1) { //多于1，才会循环跳转
+        if (state == Constant.INDEX_0) {
+            if (list.size() > Constant.INDEX_1) { //多于1，才会循环跳转
                 if (lastPosition != -1 && lastPosition != viewPager.getCurrentItem() && list.get(lastPosition) instanceof AdvanceVideoView) {
                     ((AdvanceVideoView) list.get(lastPosition)).setPause();
                 }
-                if (viewPager.getCurrentItem() < 1) { //首位之前，跳转到末尾（N）
+                if (viewPager.getCurrentItem() < Constant.INDEX_1) { //首位之前，跳转到末尾（N）
                     int position = datas.size(); //注意这里是mList，而不是mViews
                     viewPager.setCurrentItem(position, false);
                 } else if (viewPager.getCurrentItem() > datas.size()) { //末位之后，跳转到首位（1）
-                    viewPager.setCurrentItem(1, false); //false:不显示跳转过程的动画
+                    viewPager.setCurrentItem(Constant.INDEX_1, false); //false:不显示跳转过程的动画
                 }
                 current = 0;//换页重新计算时间
                 if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
@@ -217,7 +222,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 //                        Log.e("xxx","xx"+((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.toString());
 //                        ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.VISIBLE);
 //                    }
-                    mPreloadManager.resumePreload(viewPager.getCurrentItem() - 1, false);
+                    mPreloadManager.resumePreload(viewPager.getCurrentItem() - Constant.INDEX_1, false);
                     ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setVideo();
                 }
                 lastPosition = viewPager.getCurrentItem();
@@ -227,9 +232,9 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     public void setDestroy() {
         pause = true;
-        if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
+        if (list.size() > Constant.INDEX_0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setDestroy();
-            Log.e("调用销毁", " destroy");
+            Log.d(TAG, " destroy");
         }
         weakHandler.removeCallbacksAndMessages(null);
     }
@@ -238,7 +243,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         pause = true;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setPause();
-            Log.e("调用暂停", " pause");
+            Log.d(TAG, " pause");
         }
     }
 
@@ -246,7 +251,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         pause = false;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setRestart();
-            Log.e("调用start", " start");
+            Log.d(TAG, " start");
         }
     }
 
@@ -257,10 +262,10 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void onPlayStateChanged(int playState) {
-        Log.e("xxx", "xx" + playState);
+        Log.d(TAG, "onPlayStateChanged playState = " + playState);
         if (playState == VideoView.STATE_PLAYBACK_COMPLETED) {
             if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
-                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).currentPosition = 0;
+                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).currentPosition = Constant.INDEX_0;
                 if (((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView != null) {
                     ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).imageView.setVisibility(View.VISIBLE);
                 }

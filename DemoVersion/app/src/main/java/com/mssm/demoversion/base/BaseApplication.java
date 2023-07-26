@@ -5,6 +5,7 @@ import android.app.Application;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.liulishuo.filedownloader.services.DownloadMgrInitialParams;
+import com.mssm.demoversion.exception.MsCrashHandler;
 
 import me.jessyan.autosize.AutoSize;
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
@@ -30,6 +31,7 @@ public class BaseApplication extends Application {
         AutoSize.initCompatMultiProcess(this);
         initVideoPlay();
         initFileDownload();
+        MsCrashHandler.getInstance().init(this.getApplicationContext());
     }
 
     /**
@@ -37,7 +39,7 @@ public class BaseApplication extends Application {
      */
     private void initVideoPlay() {
         VideoViewManager.setConfig(VideoViewConfig.newBuilder()
-                //使用使用IjkPlayer解码
+                // 使用使用IjkPlayer解码
                 .setPlayerFactory(IjkPlayerFactory.create())
                 .setLogEnabled(true)
                 .build());

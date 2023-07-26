@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi;
 
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.activity.ScanQRCodeActivity;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.Utils;
 
@@ -132,6 +133,9 @@ public class DaemonService extends Service{
     private void startAdvertisePlayActivity(Context context) {
         String topActivityName = Utils.getTopActivityName(context);
         Log.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
+        if (ScanQRCodeActivity.class.getName().equals(topActivityName)) {
+            return;
+        }
         if (!AdvertisePlayActivity.class.getName().equals(topActivityName)) {
             Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

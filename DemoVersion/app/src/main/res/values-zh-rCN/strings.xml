@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">"MSSM广告"</string>
+
+    <string name="http_loading">"加载中&#8230;"</string>
+
+    <string name="http_unknown_error">"请求出错，未知错误"</string>
+    <string name="http_token_error">"登录失效，请重新登录"</string>
+    <string name="http_data_explain_error">"数据解析异常，请稍后"</string>
+    <string name="http_server_out_time">"服务器请求超时，请稍后再试"</string>
+    <string name="http_network_error">"请求失败，请检查网络设置"</string>
+    <string name="http_response_error">"服务器响应异常，请稍后再试"</string>
+    <string name="http_server_error">"服务器连接异常，请稍后再试"</string>
+    <string name="http_request_cancel">"请求被中断，请重试"</string>
+
+    <string name="app_crash_exit">"很抱歉，程序出现异常，即将退出"</string>
+    <string name="mqtt_connect_lost">"连接后丢失"</string>
+    <string name="mqtt_subscribe_message">"注册后得到的消息"</string>
+    <string name="mqtt_connect_success">"连接成功"</string>
+    <string name="mqtt_connect_fail">"连接失败"</string>
+    <string name="mqtt_network_name">"MQTT当前网络名称"</string>
+    <string name="mqtt_no_network">"MQTT 没有可用网络"</string>
+    <string name="mqtt_scancode_download">"二维码下载完成后跳转"</string>
+    <string name="pre_load_cancle">"预加载取消："</string>
+    <string name="pre_load_success">"预加载成功："</string>
+    <string name="pre_load_exception">"预加载异常："</string>
+    <string name="pre_read_data">" 读取数据："</string>
+    <string name="pre_exception_message">" 异常信息："</string>
+    <string name="pre_load_end">"预加载结束:"</string>
+    <string name="timer_compute_run">"倒计时："</string>
+    <string name="timer_compute_end">"倒计时结束"</string>
+</resources>

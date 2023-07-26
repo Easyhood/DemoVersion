@@ -1,14 +1,31 @@
 <resources>
-    <string name="app_name">DemoVersion</string>
+    <string name="app_name">"MSSM Advertise"</string>
 
-    <string name="http_loading">加载中&#8230;</string>
+    <string name="http_loading">"Loading&#8230;"</string>
 
-    <string name="http_unknown_error">请求出错，未知错误</string>
-    <string name="http_token_error">登录失效，请重新登录</string>
-    <string name="http_data_explain_error">数据解析异常，请稍后</string>
-    <string name="http_server_out_time">服务器请求超时，请稍后再试</string>
-    <string name="http_network_error">请求失败，请检查网络设置</string>
-    <string name="http_response_error">服务器响应异常，请稍后再试</string>
-    <string name="http_server_error">服务器连接异常，请稍后再试</string>
-    <string name="http_request_cancel">请求被中断，请重试</string>
+    <string name="http_unknown_error">"Request error, unknown error"</string>
+    <string name="http_token_error">"Login invalid, please log in again"</string>
+    <string name="http_data_explain_error">"Data parsing exception, please wait"</string>
+    <string name="http_server_out_time">"The server request timed out, please try again later"</string>
+    <string name="http_network_error">"Request failed, please check network settings"</string>
+    <string name="http_response_error">"The server responded abnormally, please try again later"</string>
+    <string name="http_server_error">"The server connection is abnormal, please try again later"</string>
+    <string name="http_request_cancel">"The request was interrupted, please try again"</string>
+
+    <string name="app_crash_exit">"Sorry, the program has an exception and is about to exit"</string>
+    <string name="mqtt_connect_lost">"lost after connection"</string>
+    <string name="mqtt_subscribe_message">"Messages received after registration"</string>
+    <string name="mqtt_connect_success">"connection succeeded"</string>
+    <string name="mqtt_connect_fail">"Connection failed"</string>
+    <string name="mqtt_network_name">"MQTT current network name"</string>
+    <string name="mqtt_no_network">"MQTT No network available"</string>
+    <string name="mqtt_scancode_download">"Jump after the QR code download is complete"</string>
+    <string name="pre_load_cancle">"Preload cancellation: "</string>
+    <string name="pre_load_success">"Preloaded successfully: "</string>
+    <string name="pre_load_exception">"Preload exception: "</string>
+    <string name="pre_read_data">" read data: "</string>
+    <string name="pre_exception_message">" Exception information: "</string>
+    <string name="pre_load_end">" End of preloading: "</string>
+    <string name="timer_compute_run">"Countdown: "</string>
+    <string name="timer_compute_end">"countdown ends"</string>
 </resources>

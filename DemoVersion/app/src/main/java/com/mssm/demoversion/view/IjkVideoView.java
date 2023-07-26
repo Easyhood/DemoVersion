@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.mssm.demoversion.util.Constant;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,7 +103,7 @@ public class IjkVideoView extends BaseVideoView<CustomIjkMediaPlayer> {
      * 开启精准seek，可以解决由于视频关键帧较少导致的seek不准确问题
      */
     public void setEnableAccurateSeek(boolean isEnable) {
-        addPlayerOption("enable-accurate-seek", isEnable ? 1 : 0);
+        addPlayerOption("enable-accurate-seek", isEnable ? Constant.INDEX_1 : Constant.INDEX_0);
     }
 
 

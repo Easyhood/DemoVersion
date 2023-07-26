@@ -15,6 +15,8 @@ import com.mssm.demoversion.activity.AdvertisePlayActivity;
  **/
 public class BootReceiver extends BroadcastReceiver {
 
+    private static final String TAG = "BootReceiver";
+
     private HandlerThread handlerThread;
     private Handler handler;
 
@@ -31,7 +33,7 @@ public class BootReceiver extends BroadcastReceiver {
         try {
             context.startActivity(intentMain);
         } catch (Exception ex) {
-            android.util.Log.e("BootStartReceiver", "bootStart.startActivity faild", ex);
+            android.util.Log.e(TAG, "bootStart.startActivity faild", ex);
         }
     }
 

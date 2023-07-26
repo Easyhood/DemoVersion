@@ -2,6 +2,8 @@ package com.mssm.demoversion.util.cache;
 
 
 import com.danikula.videocache.HttpProxyCacheServer;
+import com.mssm.demoversion.R;
+import com.mssm.demoversion.base.BaseApplication;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -83,22 +85,25 @@ public class PreloadTask implements Runnable {
                 //预加载完成或者取消预加载
                 if (mIsCanceled || read >= PreloadManager.PRELOAD_LENGTH) {
                     if (mIsCanceled) {
-                        L.i("预加载取消：" + mPosition + " 读取数据：" + read + " Byte");
+                        L.i(BaseApplication.getInstances().getString(R.string.pre_load_cancle) + mPosition +
+                                BaseApplication.getInstances().getString(R.string.pre_read_data) + read + " Byte");
                     } else {
-                        L.i("预加载成功：" + mPosition + " 读取数据：" + read + " Byte");
+                        L.i(BaseApplication.getInstances().getString(R.string.pre_load_success) + mPosition +
+                                BaseApplication.getInstances().getString(R.string.pre_read_data) + read + " Byte");
                     }
                     break;
                 }
             }
         } catch (Exception e) {
-            L.i("预加载异常：" + mPosition + " 异常信息：" + e.getMessage());
+            L.i(BaseApplication.getInstances().getString(R.string.pre_load_exception) + mPosition +
+                    BaseApplication.getInstances().getString(R.string.pre_exception_message) + e.getMessage());
             // 关入小黑屋
             blackList.add(mRawUrl);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
-            L.i("预加载结束: " + mPosition);
+            L.i(BaseApplication.getInstances().getString(R.string.pre_load_end) + mPosition);
         }
     }
 
