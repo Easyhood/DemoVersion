@@ -7,6 +7,9 @@ package com.mssm.demoversion.util;
  **/
 public class Constant {
 
+    // Bugly的APPID
+    public static final String BUGLY_APPID = "e20b968e06";
+
     // 播放界面结束广播
     public static final String ACTION_DESTROYED = "com.mssm.action.DESTROYED";
 

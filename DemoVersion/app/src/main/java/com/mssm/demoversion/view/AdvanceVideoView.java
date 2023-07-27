@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.mssm.demoversion.base.BaseApplication;
 import com.mssm.demoversion.util.cache.PreloadManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.mssm.demoversion.R;
@@ -57,7 +58,7 @@ public class AdvanceVideoView extends RelativeLayout {
         this.path = path;
         this.videoView = videoView;
         this.mPreloadManager = preloadManager;
-        Glide.with(getContext()).setDefaultRequestOptions(
+        Glide.with(BaseApplication.getInstances().getApplicationContext()).setDefaultRequestOptions(
                 new RequestOptions()
                         .frame(0)
         ).load(path).into(imageView);

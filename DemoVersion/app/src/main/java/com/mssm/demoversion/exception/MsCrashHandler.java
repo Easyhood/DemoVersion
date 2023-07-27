@@ -8,8 +8,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.mssm.demoversion.R;
+import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.base.BaseApplication;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -42,6 +45,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
     // 获取CrashHandler实例 单例模式 - 双重校验锁
     public static MsCrashHandler getInstance() {
+        Log.d(TAG, "getInstance");
         if (msCrashHandler == null) {
             synchronized (MsCrashHandler.class) {
                 if (msCrashHandler == null) {
@@ -58,6 +62,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      * @param ctx
      */
     public void init(Context ctx) {
+        Log.d(TAG, "init");
         mContext = ctx;
         //获取系统默认的UncaughtException处理器
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -70,6 +75,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread t, Throwable e) {
+        Log.d(TAG, "uncaughtException");
         if (!handleExample(e) && mDefaultHandler != null) {
             // 如果用户没有处理则让系统默认的异常处理器来处理 目的是判断异常是否已经被处理
             mDefaultHandler.uncaughtException(t, e);
@@ -105,7 +111,8 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
         new Thread(() -> {
             // Toast 显示需要出现在一个线程的消息队列中
             Looper.prepare();
-            Toast.makeText(mContext, R.string.app_crash_exit, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.app_crash_exit,
+                    Toast.LENGTH_SHORT).show();
             Looper.loop();
         }).start();
 
@@ -118,17 +125,12 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      * 重启应用
      */
     public void restartApp() {
-//        Intent intent = new Intent(AppApplication.getContext(), SplashActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startActivity(intent);
-//        android.os.Process.killProcess(android.os.Process.myPid());
-//        System.exit(1);
-
-        // 重启应用
-        mContext.startActivity(mContext.getPackageManager().getLaunchIntentForPackage(mContext.getPackageName()));
-        //干掉当前的程序
+        Intent intent = new Intent(BaseApplication.getInstances().getApplicationContext(),
+                AdvertisePlayActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
         android.os.Process.killProcess(android.os.Process.myPid());
-
+        System.exit(1);
     }
 
     /**
@@ -137,6 +139,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      * @param ex
      */
     private void saveCrashInfoToFile(Throwable ex) {
+        Log.d(TAG, "saveCrashInfoToFile ex : " + ex);
         //获取错误原因
         Writer writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
@@ -150,6 +153,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
         // 错误日志文件名称
         String fileName = "crash-" + timeStampDate() + ".log";
+        Log.d(TAG, "saveCrashInfoToFile: fileName = " + fileName);
 
         // 判断sd卡可正常使用
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -158,17 +162,22 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
             File fl = new File(path);
             //创建文件夹
             if (!fl.exists()) {
+                Log.d(TAG, "saveCrashInfoToFile: !fl.exists()");
                 fl.mkdirs();
             }
+            String saveFilePath = Environment.getExternalStorageDirectory().getPath() +
+                    "/crash_logInfo/" + fileName;
             try {
-                FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
+                FileOutputStream fileOutputStream = new FileOutputStream(saveFilePath);
                 fileOutputStream.write(writer.toString().getBytes());
                 fileOutputStream.close();
-            } catch (IOException e1) {
+                Log.d(TAG, "saveCrashInfoToFile: fileOutputStream.close");
+            } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
-            } catch (Exception e2) {
+                Log.d(TAG, "saveCrashInfoToFile: e1 = " + e1.getMessage());
+            } catch (IOException e2) {
                 e2.printStackTrace();
-                Log.d(TAG, "saveCrashInfoToFile: " + e2.getMessage());
+                Log.d(TAG, "saveCrashInfoToFile: e2 = " + e2.getMessage());
             }
         }
     }
@@ -179,7 +188,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      */
     public String timeStampDate() {
         Date nowTime = new Date(System.currentTimeMillis());
-        SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:dd");
+        SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd-HH_mm_dd");
         return sdFormatter.format(nowTime);
     }
 }

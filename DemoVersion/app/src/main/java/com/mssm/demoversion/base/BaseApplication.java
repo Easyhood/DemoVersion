@@ -2,10 +2,14 @@ package com.mssm.demoversion.base;
 
 import android.app.Application;
 
+import com.google.android.material.circularreveal.CircularRevealHelper;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.liulishuo.filedownloader.services.DownloadMgrInitialParams;
 import com.mssm.demoversion.exception.MsCrashHandler;
+import com.mssm.demoversion.util.Constant;
+import com.tencent.bugly.crashreport.CrashReport;
+import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
 import me.jessyan.autosize.AutoSize;
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
@@ -20,6 +24,8 @@ import xyz.doikki.videoplayer.player.VideoViewManager;
 public class BaseApplication extends Application {
     public static BaseApplication instances;
 
+    private static YF_RK356x_API_Manager yfapiManager;
+
     // private HttpProxyCacheServer proxy;
     public static BaseApplication getInstances() {
         return instances;
@@ -28,10 +34,25 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instances = this;
+        yfapiManager = new YF_RK356x_API_Manager(getInstances());
+
         AutoSize.initCompatMultiProcess(this);
         initVideoPlay();
         initFileDownload();
-        MsCrashHandler.getInstance().init(this.getApplicationContext());
+        MsCrashHandler.getInstance().init(getInstances().getApplicationContext());
+        initBuglySetting();
+    }
+
+    /**
+     * 初始化Bugly设置
+     */
+    private void initBuglySetting() {
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+        strategy.setDeviceID(yfapiManager.yfgetSerialNumber());
+        strategy.setAppChannel(yfapiManager.yfgetSerialNumber());
+        strategy.setDeviceModel(yfapiManager.yfgetAndroidDeviceModel());
+        strategy.setEnableCatchAnrTrace(true);
+        CrashReport.initCrashReport(getApplicationContext(), Constant.BUGLY_APPID, false, strategy);
     }
 
     /**

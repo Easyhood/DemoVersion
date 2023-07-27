@@ -12,7 +12,10 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' , 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -63,10 +66,13 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
-    //MQTT
+    // MQTT
     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-
+    // Bugly
+    // 其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如4.0.3, 例如3.9.2
+    implementation 'com.tencent.bugly:crashreport:latest.release'
+    // implementation 'com.tencent.rqd:nativecrashreport:latest.release'
 
 }
