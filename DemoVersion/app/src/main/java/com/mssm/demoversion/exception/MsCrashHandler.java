@@ -59,7 +59,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
     /**
      * 初始化
      *
-     * @param ctx
+     * @param ctx Context
      */
     public void init(Context ctx) {
         Log.d(TAG, "init");

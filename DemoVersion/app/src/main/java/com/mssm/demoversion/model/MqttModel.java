@@ -23,6 +23,10 @@ public class MqttModel {
     @SerializedName("event_uuid")
     public String eventUUID;
 
+    // 结束文字
+    @SerializedName("end_text")
+    public String endText;
+
     // 背景布局数据列表
     @SerializedName("bg_layer")
     public BgLayerModel bgLayerModel;
@@ -43,6 +47,10 @@ public class MqttModel {
         return eventUUID;
     }
 
+    public String getEndText() {
+        return endText;
+    }
+
     public BgLayerModel getBgLayerModel() {
         return bgLayerModel;
     }
@@ -57,6 +65,7 @@ public class MqttModel {
                 "cmdStr='" + cmdStr + '\'' +
                 ", displayTime=" + displayTime +
                 ", eventUUID='" + eventUUID + '\'' +
+                ", endText='" + endText + '\'' +
                 ", bgLayerModel=" + bgLayerModel +
                 ", topLayerModel=" + topLayerModel +
                 '}';

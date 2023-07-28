@@ -21,6 +21,7 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.activity.EndDisplayActivity;
 import com.mssm.demoversion.activity.ScanQRCodeActivity;
 import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.AdvertiseModel;
@@ -110,8 +111,13 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
                 Log.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
                 if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
                     startResMultiDownload(mqttModel);
-                } else if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
-                    startAdvertisePlayActivity(getApplicationContext());
+                } else if (Constant.END_RT_EVENT.equals(mqttModel.getCmdStr())) {
+                    Log.d(TAG, "messageArrived: getDisplayTime = " + mqttModel.getDisplayTime());
+                    if (mqttModel.getDisplayTime() != Constant.INDEX_0) {
+                        startToEndDisplay(getApplicationContext());
+                    } else {
+                        startAdvertisePlayActivity(getApplicationContext());
+                    }
                 } else {
                     Log.d(TAG, "messageArrived: mqttModel.getCmdStr() is new");
                 }
@@ -306,6 +312,18 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         intent.putExtra("bean", messageJson);
         intent.putExtra("localtopBgPath", localtopBgPath);
         intent.putExtra("localtopFloatPath", localtopFloatPath);
+        startActivity(intent);
+    }
+
+    /**
+     * 跳转到二维码扫描互动界面
+     *
+     * @param context Context
+     */
+    private void startToEndDisplay(Context context) {
+        Intent intent = new Intent(context, EndDisplayActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("bean", messageJson);
         startActivity(intent);
     }
 

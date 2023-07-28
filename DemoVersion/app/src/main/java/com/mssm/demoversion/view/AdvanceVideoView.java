@@ -1,6 +1,7 @@
 package com.mssm.demoversion.view;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,6 @@ public class AdvanceVideoView extends RelativeLayout {
     private RelativeLayout videoRela;
     private String path;
     public int currentPosition;
-
 
     public AdvanceVideoView(Context context) {
         super(context);

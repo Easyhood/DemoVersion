@@ -62,6 +62,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
                 mPreloadManager.addPreloadTask(advances.get(i).path, i);
             }
             time = (int) advances.get(i).playTime;
+            Log.d(TAG, "setData: time = " + time);
         }
         if (isRunning) {
             if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
@@ -192,7 +193,6 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 //    // 实现ViewPager.OnPageChangeListener接口
     @Override
     public void onPageSelected(int position) {
-
     }
 
     @Override
@@ -204,6 +204,8 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        Log.d(TAG, "onPageScrollStateChanged state = " + state);
+        Log.d(TAG, "onPageScrollStateChanged: viewPager.getCurrentItem() = " + viewPager.getCurrentItem());
         // 由于viewpager的预加载机制onPageSelected这里面加载videoview 放的跟玩一样  等操作完成后再播放videoview就香了  很丝滑
         if (state == Constant.INDEX_0) {
             if (list.size() > Constant.INDEX_1) { //多于1，才会循环跳转
@@ -257,12 +259,10 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void onPlayerStateChanged(int playerState) {
-
     }
 
     @Override
     public void onPlayStateChanged(int playState) {
-        Log.d(TAG, "onPlayStateChanged playState = " + playState);
         if (playState == VideoView.STATE_PLAYBACK_COMPLETED) {
             if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
                 ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).currentPosition = Constant.INDEX_0;
