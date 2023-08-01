@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -20,6 +21,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.presenter.TimerComputedListener;
@@ -31,7 +37,9 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Easyhood
@@ -77,6 +85,13 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     // 本地二维码图片
     private String localtopFloatPath;
 
+    private Bitmap qrBitmap;
+
+    private String qrUrl = "https://test-admin.woozatop.com//ad_files/20230716/281c8692-2fc4-463c-bfac-618956d17566.png";
+
+    private int qrWidth = 360;
+    private int qrHeight = 360;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -94,17 +109,18 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         Log.d(TAG, "init");
         initMqttModel();
         playlist = new ArrayList<>();
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_2));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_3));
+        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1));
+
         // 播放视频预览界面
         surfaceVideo = findViewById(R.id.surface_video);
         rlScanQRCode= findViewById(R.id.rl_scanqrcode);
         ivQrCodeBg = findViewById(R.id.iv_qrcodebg);
+        ivQrCodeBg.setVisibility(View.GONE);
         ivQrCode = findViewById(R.id.iv_qrcode);
         tvTimer = findViewById(R.id.tv_timer);
-        initTopBgImage();
-        initScanQRCodeImage();
+        // initTopBgImage();
+        // initScanQRCodeImage();
+        initQRCode();
         // 设置点击事件
         surfaceVideo.setOnClickListener(this::onClick);
         // meidiaplayer对象
@@ -157,6 +173,35 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     }
 
     /**
+     * 初始化二维码
+     */
+    private void initQRCode() {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        Map<EncodeHintType, String> hints = new HashMap<>();
+        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        BitMatrix encode = null;
+        qrUrl = mqttModel.getTopLayerModel().getTopFloatImgModel().getResUrl();
+        try {
+            encode = qrCodeWriter.encode(qrUrl, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
+        } catch (WriterException exception) {
+            Log.d(TAG, "initQRCode: exception is " + exception);
+            exception.printStackTrace();
+        }
+        int[] colors = new int[qrWidth * qrHeight];
+        for (int i = 0; i < qrWidth; i++) {
+            for (int j = 0; j < qrHeight; j++) {
+                if (encode.get(i, j)) {
+                    colors[i * qrWidth + j] = Color.BLACK;
+                } else {
+                    colors[i * qrWidth + j] = Color.WHITE;
+                }
+            }
+        }
+        qrBitmap = Bitmap.createBitmap(colors, qrWidth, qrHeight, Bitmap.Config.RGB_565);
+        ivQrCode.setImageBitmap(qrBitmap);
+    }
+
+    /**
      * 初始化二维码图片
      */
     private void initScanQRCodeImage() {
@@ -179,7 +224,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         params.leftMargin = display_offset_x;
         params.topMargin = display_offset_y;
         ivQrCode.setImageBitmap(topFloatBitmap);
-        rlScanQRCode.addView(ivQrCode, params);
+        rlScanQRCode.addView(ivQrCode);
     }
 
     @Override
@@ -206,7 +251,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "onCompletion: Easyhood");
-        playNextVideo();
+        // playNextVideo();
     }
 
     /**
@@ -221,11 +266,12 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
 //
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1);
+                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1);
                     mediaPlayer.setDataSource(getApplicationContext(), uri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.prepare();
                     mediaPlayer.setDisplay(surfaceVideo.getHolder());
+                    mediaPlayer.setLooping(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -301,4 +347,5 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
             startActivity(activityIntent);
         }
     }
+
 }

@@ -82,8 +82,8 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      */
     private void initData() {
         playlist = new ArrayList<>();
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_2));
+        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1));
+        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_3));
         // meidiaplayer对象
         mediaPlayer = new MediaPlayer();
         currentVideoIndex = 0;
@@ -97,7 +97,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
         } else {
             svEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
-            ivEndBg.setImageResource(R.drawable.ic_launcher_background);
+            ivEndBg.setImageResource(R.drawable.dlpg_1);
         }
         tvEndTitle.setText(endTitle);
         new Handler().postDelayed(new Runnable() {

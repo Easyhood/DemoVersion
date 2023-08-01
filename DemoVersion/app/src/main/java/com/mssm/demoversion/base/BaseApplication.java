@@ -22,6 +22,8 @@ import xyz.doikki.videoplayer.player.VideoViewManager;
  * @since 2023/7/11
  **/
 public class BaseApplication extends Application {
+
+    private static final String TAG = "BaseApplication";
     public static BaseApplication instances;
 
     private static YF_RK356x_API_Manager yfapiManager;

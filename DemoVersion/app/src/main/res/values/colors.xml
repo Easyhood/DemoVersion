@@ -62,4 +62,6 @@
     <color name="money_one_color">#88E2E1</color>
     <color name="money_two_color">#F23A50</color>
     <color name="money_three_color">#F6AB5B</color>
+
+    <color name="sunshine_blue">#7CECFA</color>
 </resources>

@@ -91,7 +91,7 @@ public class TimerTextView extends TextView implements Runnable{
         //标示已经启动
         if(isRun){
             ComputeTime();
-            String timeStr= BaseApplication.getInstances().getString(R.string.timer_compute_run) + mSecond;
+            String timeStr= String.valueOf(mSecond);
             this.setText(timeStr);
             postDelayed(this, 1000);
         }else {

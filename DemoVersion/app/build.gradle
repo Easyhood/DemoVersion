@@ -74,4 +74,6 @@ dependencies {
     // 其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如4.0.3, 例如3.9.2
     implementation 'com.tencent.bugly:crashreport:latest.release'
     // implementation 'com.tencent.rqd:nativecrashreport:latest.release'
+    // ZXing二维码
+    implementation 'com.google.zxing:core:3.3.3'
 }
