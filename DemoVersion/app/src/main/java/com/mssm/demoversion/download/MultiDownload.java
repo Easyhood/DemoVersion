@@ -11,6 +11,7 @@ import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 
 import java.io.File;
 import java.util.List;
@@ -27,8 +28,8 @@ public class MultiDownload {
 
     private int mTaskCount;
 
-    //public String mSaveFolder = FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "feifei_save";
-    public static String mSaveFolder = Environment.getExternalStorageDirectory() + "/MSSMDownload";
+    // DOWNLOAD_PATH
+    public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMDownload/";
 
     public FileDownloadListener createLis(int tag) {
         return new FileDownloadSampleListener() {
@@ -37,7 +38,7 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "pending taskId:" + task.getId() + ",fileName:"
+                LogUtils.d(TAG, "pending taskId:" + task.getId() + ",fileName:"
                         + task.getFilename() + ",soFarBytes:" + soFarBytes + ",totalBytes:"
                         + totalBytes + ",percent:" + soFarBytes * 1.0 / totalBytes);
 
@@ -48,7 +49,7 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "progress taskId:" + task.getId() + ",fileName:"
+                LogUtils.d(TAG, "progress taskId:" + task.getId() + ",fileName:"
                         + task.getFilename() + ",soFarBytes:" + soFarBytes + ",totalBytes:"
                         + totalBytes + ",percent:" + soFarBytes * 1.0 / totalBytes + ",speed:" + task.getSpeed());
             }
@@ -58,11 +59,11 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
+                LogUtils.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
                         + task.getPath() + ",fileName:" + task.getFilename() + ",speed:"
                         + task.getSpeed() + ",isReuse:" + task.reuse());
                 mTaskCount --;
-                Log.d(TAG, "blockComplete: mTaskCount = " + mTaskCount);
+                LogUtils.d(TAG, "blockComplete: mTaskCount = " + mTaskCount);
                 if (mTaskCount == Constant.INDEX_0) {
                     completed(task);
                 }
@@ -70,12 +71,12 @@ public class MultiDownload {
 
             @Override
             protected void completed(BaseDownloadTask task) {
-                Log.d(TAG, "completed");
+                LogUtils.d(TAG, "completed");
                 CallBackUtils.doCallBackMethod(tag);
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "completed taskId:" + task.getId() + ",isReuse:" + task.reuse());
+                LogUtils.d(TAG, "completed taskId:" + task.getId() + ",isReuse:" + task.reuse());
             }
 
             @Override
@@ -83,7 +84,7 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "paused taskId:" + task.getId() + ",soFarBytes:" + soFarBytes
+                LogUtils.d(TAG, "paused taskId:" + task.getId() + ",soFarBytes:" + soFarBytes
                         + ",totalBytes:" + totalBytes + ",percent:" + soFarBytes * 1.0 / totalBytes);
             }
 
@@ -92,7 +93,7 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "error taskId:" + task.getId() + ",e:" + e.getLocalizedMessage());
+                LogUtils.d(TAG, "error taskId:" + task.getId() + ",e:" + e.getLocalizedMessage());
             }
 
             @Override
@@ -100,7 +101,7 @@ public class MultiDownload {
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-                Log.d(TAG, "warn taskId:" + task.getId());
+                LogUtils.d(TAG, "warn taskId:" + task.getId());
             }
         };
     }

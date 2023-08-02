@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
+import com.mssm.demoversion.util.LogUtils;
 
 /**
  * @author Easyhood
@@ -33,7 +34,7 @@ public class BootReceiver extends BroadcastReceiver {
         try {
             context.startActivity(intentMain);
         } catch (Exception ex) {
-            android.util.Log.e(TAG, "bootStart.startActivity faild", ex);
+            LogUtils.e(TAG, "bootStart.startActivity faild ! Cause by " + ex);
         }
     }
 

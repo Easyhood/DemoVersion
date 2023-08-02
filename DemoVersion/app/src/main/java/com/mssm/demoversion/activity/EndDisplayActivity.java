@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 
 import java.io.IOException;
@@ -113,14 +114,14 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      * 初始化MqttModel
      */
     private void initMqttModel() {
-        Log.d(TAG, "initMqttModel");
+        LogUtils.d(TAG, "initMqttModel");
         Intent intent = getIntent();
         if (intent == null) {
             Log.d(TAG, "init: intent is null");
             return;
         }
         String mqttModelStr = intent.getStringExtra("bean");
-        Log.d(TAG, "init: mqttModelStr = " + mqttModelStr);
+        LogUtils.d(TAG, "init: mqttModelStr = " + mqttModelStr);
         if (mqttModelStr == null) {
             return;
         }
@@ -147,30 +148,30 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        Log.d(TAG, "onCompletion: Easyhood");
+        LogUtils.d(TAG, "onCompletion: Easyhood");
         playNextVideo();
     }
 
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
-        Log.d(TAG, "onPrepared: Easyhood");
+        LogUtils.d(TAG, "onPrepared: Easyhood");
         mediaPlayer.start();
     }
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: Easyhood");
+        LogUtils.d(TAG, "onClick: Easyhood");
     }
 
     /**
      * 开始播放视频
      */
     private void startPlay() {
-        Log.d(TAG, "startPlay: Easyhood");
+        LogUtils.d(TAG, "startPlay: Easyhood");
         svEndBg.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceCreated: Easyhood");
+                LogUtils.d(TAG, "surfaceCreated: Easyhood");
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
 //
@@ -186,12 +187,12 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
 
             @Override
             public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "surfaceChanged: Easyhood");
+                LogUtils.d(TAG, "surfaceChanged: Easyhood");
             }
 
             @Override
             public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceDestroyed: Easyhood");
+                LogUtils.d(TAG, "surfaceDestroyed: Easyhood");
             }
         });
     }
@@ -226,7 +227,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      */
     private void startAdvertisePlayActivity(Context context) {
         String topActivityName = Utils.getTopActivityName(context);
-        Log.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
+        LogUtils.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
         if (!AdvertisePlayActivity.class.getName().equals(topActivityName)) {
             Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

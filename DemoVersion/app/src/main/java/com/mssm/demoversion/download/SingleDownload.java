@@ -7,6 +7,7 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
+import com.mssm.demoversion.util.LogUtils;
 
 import java.io.File;
 
@@ -40,7 +41,7 @@ public class SingleDownload {
                 .setListener(new FileDownloadSampleListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d(TAG, "pending taskId:" + task.getId() + ",soFarBytes:"
+                        LogUtils.d(TAG, "pending taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes);
 
@@ -48,40 +49,40 @@ public class SingleDownload {
 
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d(TAG, "progress taskId:" + task.getId() + ",soFarBytes:"
+                        LogUtils.d(TAG, "progress taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes + ",speed:" + task.getSpeed());
                     }
 
                     @Override
                     protected void blockComplete(BaseDownloadTask task) {
-                        Log.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
+                        LogUtils.d(TAG, "blockComplete taskId:" + task.getId() + ",filePath:"
                                 + task.getPath() + ",fileName:" + task.getFilename()
                                 + ",speed:" + task.getSpeed() + ",isReuse:" + task.reuse());
                     }
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
-                        Log.d(TAG, "completed taskId:" + task.getId() + ",isReuse:"
+                        LogUtils.d(TAG, "completed taskId:" + task.getId() + ",isReuse:"
                                 + task.reuse());
                     }
 
                     @Override
                     protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Log.d(TAG, "paused taskId:" + task.getId() + ",soFarBytes:"
+                        LogUtils.d(TAG, "paused taskId:" + task.getId() + ",soFarBytes:"
                                 + soFarBytes + ",totalBytes:" + totalBytes + ",percent:"
                                 + soFarBytes * 1.0 / totalBytes);
                     }
 
                     @Override
                     protected void error(BaseDownloadTask task, Throwable e) {
-                        Log.d(TAG, "error taskId:" + task.getId() + ",e:"
+                        LogUtils.d(TAG, "error taskId:" + task.getId() + ",e:"
                                 + e.getLocalizedMessage());
                     }
 
                     @Override
                     protected void warn(BaseDownloadTask task) {
-                        Log.d(TAG, "warn taskId:" + task.getId());
+                        LogUtils.d(TAG, "warn taskId:" + task.getId());
                     }
                 });
 
@@ -91,7 +92,7 @@ public class SingleDownload {
 
 
     public void pause_single() {
-        Log.d(TAG, "pause_single task:" + singleTaskId);
+        LogUtils.d(TAG, "pause_single task:" + singleTaskId);
         FileDownloader.getImpl().pause(singleTaskId);
     }
 
@@ -105,7 +106,7 @@ public class SingleDownload {
             delate = targetFile.delete();
         }
 
-        Log.d(TAG, "delete_single file,deleteDataBase:" + deleteData
+        LogUtils.d(TAG, "delete_single file,deleteDataBase:" + deleteData
                 + ",mSinglePath:" + mSinglePath + ",delate:" + delate);
 
         new File(FileDownloadUtils.getTempPath(mSinglePath)).delete();

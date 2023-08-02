@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.base.BaseApplication;
+import com.mssm.demoversion.util.LogUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +29,8 @@ import java.util.Date;
  **/
 public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
+    public static final String CRASH_PATH = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
+
     private static final String TAG = "MsCrashHandler";
 
     // 系统默认的UncaughtException处理类
@@ -45,7 +48,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
     // 获取CrashHandler实例 单例模式 - 双重校验锁
     public static MsCrashHandler getInstance() {
-        Log.d(TAG, "getInstance");
+        LogUtils.d(TAG, "getInstance");
         if (msCrashHandler == null) {
             synchronized (MsCrashHandler.class) {
                 if (msCrashHandler == null) {
@@ -62,7 +65,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      * @param ctx Context
      */
     public void init(Context ctx) {
-        Log.d(TAG, "init");
+        LogUtils.d(TAG, "init");
         mContext = ctx;
         //获取系统默认的UncaughtException处理器
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -75,7 +78,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        Log.d(TAG, "uncaughtException");
+        LogUtils.d(TAG, "uncaughtException");
         if (!handleExample(e) && mDefaultHandler != null) {
             // 如果用户没有处理则让系统默认的异常处理器来处理 目的是判断异常是否已经被处理
             mDefaultHandler.uncaughtException(t, e);
@@ -84,10 +87,10 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
                 Thread.sleep(3000);
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
-                Log.d(TAG, "uncaughtException: " + e1.getMessage());
+                LogUtils.d(TAG, "uncaughtException: " + e1.getMessage());
             } catch (Exception e2) {
                 e2.printStackTrace();
-                Log.d(TAG, "uncaughtException: " + e2.getMessage());
+                LogUtils.d(TAG, "uncaughtException: " + e2.getMessage());
             }
             /** 关闭App 与下面的restartApp重启App保留一个就行 看你需求 **/
             // 如果不关闭程序,会导致程序无法启动,需要完全结束进程才能重新启动
@@ -139,7 +142,7 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
      * @param ex
      */
     private void saveCrashInfoToFile(Throwable ex) {
-        Log.d(TAG, "saveCrashInfoToFile ex : " + ex);
+        LogUtils.d(TAG, "saveCrashInfoToFile ex : " + ex);
         //获取错误原因
         Writer writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
@@ -153,16 +156,15 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
         // 错误日志文件名称
         String fileName = "crash-" + timeStampDate() + ".log";
-        Log.d(TAG, "saveCrashInfoToFile: fileName = " + fileName);
+        LogUtils.d(TAG, "saveCrashInfoToFile: fileName = " + fileName);
 
         // 判断sd卡可正常使用
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             //文件存储位置
-            String path = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
-            File fl = new File(path);
+            File fl = new File(CRASH_PATH);
             //创建文件夹
             if (!fl.exists()) {
-                Log.d(TAG, "saveCrashInfoToFile: !fl.exists()");
+                LogUtils.d(TAG, "saveCrashInfoToFile: !fl.exists()");
                 fl.mkdirs();
             }
             String saveFilePath = Environment.getExternalStorageDirectory().getPath() +
@@ -171,13 +173,13 @@ public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
                 FileOutputStream fileOutputStream = new FileOutputStream(saveFilePath);
                 fileOutputStream.write(writer.toString().getBytes());
                 fileOutputStream.close();
-                Log.d(TAG, "saveCrashInfoToFile: fileOutputStream.close");
+                LogUtils.d(TAG, "saveCrashInfoToFile: fileOutputStream.close");
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
-                Log.d(TAG, "saveCrashInfoToFile: e1 = " + e1.getMessage());
+                LogUtils.d(TAG, "saveCrashInfoToFile: e1 = " + e1.getMessage());
             } catch (IOException e2) {
                 e2.printStackTrace();
-                Log.d(TAG, "saveCrashInfoToFile: e2 = " + e2.getMessage());
+                LogUtils.d(TAG, "saveCrashInfoToFile: e2 = " + e2.getMessage());
             }
         }
     }

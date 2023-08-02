@@ -9,6 +9,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.WeakHandler;
 import com.mssm.demoversion.util.cache.PreloadManager;
 
@@ -62,7 +63,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
                 mPreloadManager.addPreloadTask(advances.get(i).path, i);
             }
             time = (int) advances.get(i).playTime;
-            Log.d(TAG, "setData: time = " + time);
+            LogUtils.d(TAG, "setData: time = " + time);
         }
         if (isRunning) {
             if (list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
@@ -174,7 +175,9 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView(list.get(position));
+        if (position < list.size()) {
+            container.removeView(list.get(position));
+        }
     }
 
     @Override
@@ -204,8 +207,8 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Log.d(TAG, "onPageScrollStateChanged state = " + state);
-        Log.d(TAG, "onPageScrollStateChanged: viewPager.getCurrentItem() = " + viewPager.getCurrentItem());
+        LogUtils.d(TAG, "onPageScrollStateChanged state = " + state);
+        LogUtils.d(TAG, "onPageScrollStateChanged: viewPager.getCurrentItem() = " + viewPager.getCurrentItem());
         // 由于viewpager的预加载机制onPageSelected这里面加载videoview 放的跟玩一样  等操作完成后再播放videoview就香了  很丝滑
         if (state == Constant.INDEX_0) {
             if (list.size() > Constant.INDEX_1) { //多于1，才会循环跳转
@@ -236,7 +239,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         pause = true;
         if (list.size() > Constant.INDEX_0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setDestroy();
-            Log.d(TAG, " destroy");
+            LogUtils.d(TAG, " destroy");
         }
         weakHandler.removeCallbacksAndMessages(null);
     }
@@ -245,7 +248,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         pause = true;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setPause();
-            Log.d(TAG, " pause");
+            LogUtils.d(TAG, " pause");
         }
     }
 
@@ -253,7 +256,7 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
         pause = false;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setRestart();
-            Log.d(TAG, " start");
+            LogUtils.d(TAG, " start");
         }
     }
 

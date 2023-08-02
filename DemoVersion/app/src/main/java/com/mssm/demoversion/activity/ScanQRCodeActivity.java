@@ -31,6 +31,7 @@ import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.presenter.TimerComputedListener;
 import com.mssm.demoversion.services.MsMqttService;
 import com.mssm.demoversion.util.CallBackUtils;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.TimerTextView;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -94,7 +95,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
+        LogUtils.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_qrcode);
         CallBackUtils.setTimerComputedListener(this);
@@ -106,7 +107,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      * 初始化工作
      */
     private void init() {
-        Log.d(TAG, "init");
+        LogUtils.d(TAG, "init");
         initMqttModel();
         playlist = new ArrayList<>();
         playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1));
@@ -120,7 +121,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         tvTimer = findViewById(R.id.tv_timer);
         // initTopBgImage();
         // initScanQRCodeImage();
-        initQRCode();
         // 设置点击事件
         surfaceVideo.setOnClickListener(this::onClick);
         // meidiaplayer对象
@@ -130,6 +130,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
         startPlay();
+        initQRCode();
         tvTimer.setTimes(playTimeL);
         tvTimer.beginRun();
     }
@@ -138,16 +139,16 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      * 初始化MqttModel
      */
     private void initMqttModel() {
-        Log.d(TAG, "initMqttModel");
+        LogUtils.d(TAG, "initMqttModel");
         Intent intent = getIntent();
         if (intent == null) {
-            Log.d(TAG, "init: intent is null");
+            LogUtils.d(TAG, "init: intent is null");
             return;
         }
         String mqttModelStr = intent.getStringExtra("bean");
         localtopBgPath = intent.getStringExtra("localtopBgPath");
         localtopFloatPath = intent.getStringExtra("localtopFloatPath");
-        Log.d(TAG, "init: mqttModelStr = " + mqttModelStr);
+        LogUtils.d(TAG, "init: mqttModelStr = " + mqttModelStr);
         if (mqttModelStr == null) {
             return;
         }
@@ -184,16 +185,16 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         try {
             encode = qrCodeWriter.encode(qrUrl, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
         } catch (WriterException exception) {
-            Log.d(TAG, "initQRCode: exception is " + exception);
+            LogUtils.d(TAG, "initQRCode: exception is " + exception);
             exception.printStackTrace();
         }
         int[] colors = new int[qrWidth * qrHeight];
         for (int i = 0; i < qrWidth; i++) {
             for (int j = 0; j < qrHeight; j++) {
                 if (encode.get(i, j)) {
-                    colors[i * qrWidth + j] = Color.BLACK;
-                } else {
                     colors[i * qrWidth + j] = Color.WHITE;
+                } else {
+                    colors[i * qrWidth + j] = getColor(R.color.treasure_drak_black);
                 }
             }
         }
@@ -208,7 +209,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         rlScanQRCode.removeView(ivQrCode);
         Bitmap topFloatBitmap = BitmapFactory.decodeFile(localtopFloatPath);
         if (mqttModel == null) {
-            Log.d(TAG, "initScanQRCodeImage: mqttModel is null");
+            LogUtils.d(TAG, "initScanQRCodeImage: mqttModel is null");
             return;
         }
         int display_width = mqttModel.getTopLayerModel().getTopFloatImgModel().
@@ -229,7 +230,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: Easyhood");
+        LogUtils.d(TAG, "onClick: Easyhood");
     }
 
     /**
@@ -239,7 +240,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
-        Log.d(TAG, "onPrepared: Easyhood");
+        LogUtils.d(TAG, "onPrepared: Easyhood");
         mediaPlayer.start();
     }
 
@@ -250,7 +251,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      */
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d(TAG, "onCompletion: Easyhood");
+        LogUtils.d(TAG, "onCompletion: Easyhood");
         // playNextVideo();
     }
 
@@ -258,11 +259,11 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      * 开始播放视频
      */
     private void startPlay() {
-        Log.d(TAG, "startPlay: Easyhood");
+        LogUtils.d(TAG, "startPlay: Easyhood");
         surfaceVideo.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceCreated: Easyhood");
+                LogUtils.d(TAG, "surfaceCreated: Easyhood");
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
 //
@@ -279,12 +280,12 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
             @Override
             public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "surfaceChanged: Easyhood");
+                LogUtils.d(TAG, "surfaceChanged: Easyhood");
             }
 
             @Override
             public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "surfaceDestroyed: Easyhood");
+                LogUtils.d(TAG, "surfaceDestroyed: Easyhood");
             }
         });
     }
@@ -328,7 +329,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void ComputedCallBack(long secondTime) {
-        Log.d(TAG, "ComputedCallBack " + getString(R.string.timer_compute_end));
+        LogUtils.d(TAG, "ComputedCallBack " + getString(R.string.timer_compute_end));
         startAdvertisePlayActivity(getApplicationContext());
         finish();
     }
@@ -340,7 +341,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      */
     private void startAdvertisePlayActivity(Context context) {
         String topActivityName = Utils.getTopActivityName(context);
-        Log.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
+        LogUtils.d(TAG, "startAdvertisePlayActivity: topActivityName is " + topActivityName);
         if (!AdvertisePlayActivity.class.getName().equals(topActivityName)) {
             Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -1,13 +1,14 @@
 package com.mssm.demoversion.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,6 +23,7 @@ import com.mssm.demoversion.services.DaemonService;
 import com.mssm.demoversion.services.MsMqttService;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.util.cache.PreloadManager;
@@ -29,6 +31,7 @@ import com.mssm.demoversion.view.Advance;
 import com.mssm.demoversion.view.AdvanceView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -55,7 +58,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     //  首次打开应用
     private boolean isFirstOpen;
 
-    public Handler mHandler = new Handler(Looper.myLooper()){
+    public Handler mHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -70,7 +73,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
 
                     break;
                 default:
-                    Log.d(TAG, "handleMessage default");
+                    LogUtils.d(TAG, "handleMessage default");
             }
         }
     };
@@ -92,12 +95,14 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         Intent intent = new Intent(this, DaemonService.class);
         startForegroundService(intent);
         startMqttService();
+        regularlyDelete();
     }
 
-
+    /**
+     * 打开MQTT服务
+     */
     private void startMqttService() {
         Intent intent = new Intent(this, MsMqttService.class);
-        //bindService(intent, mqttServiceConnection, Context.BIND_AUTO_CREATE);
         startForegroundService(intent);
     }
 
@@ -133,7 +138,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         cycleRunnable = new Runnable() {
             @Override
             public void run() {
-                if (isFirstOpen){
+                if (isFirstOpen) {
                     SharedPreferencesUtils.putString(getApplicationContext(), Constant.AD_UUID_KEY,
                             Constant.AD_UUID_KEY);
                     isFirstOpen = false;
@@ -144,11 +149,12 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         };
         cycleHandler.post(cycleRunnable);
     }
+
     /**
      * 初始化下载数据
      */
-    public void initDownloadData(){
-        Log.d(TAG, "initDownloadData");
+    public void initDownloadData() {
+        LogUtils.d(TAG, "initDownloadData");
         data.clear();
         data = httpRequest.getData();
         mViewPager.setData(data);
@@ -163,9 +169,9 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
      */
     private void addAdvancePhotoData(String sourcePath, int rawId, Context context) {
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
-        Log.d(TAG, "addAdvanceData: " + path);
+        LogUtils.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
-            Advance advance = new Advance(path, Constant.IMAGE_INDEX,0);
+            Advance advance = new Advance(path, Constant.IMAGE_INDEX, 0);
             data.add(advance);
         }
     }
@@ -179,7 +185,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
      */
     private void addAdvanceVideoData(String sourcePath, int rawId, Context context) {
         String path = Utils.checkDefaultFilePath(sourcePath, rawId, context);
-        Log.d(TAG, "addAdvanceData: " + path);
+        LogUtils.d(TAG, "addAdvanceData: " + path);
         if (path != null) {
             Advance advance = new Advance(path, Constant.VIDEO_INDEX, 5000);
             data.add(advance);
@@ -192,7 +198,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         mViewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "onTouch: mViewPager");
+                LogUtils.d(TAG, "onTouch: mViewPager");
                 return true;
             }
         });
@@ -201,7 +207,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
+        LogUtils.d(TAG, "onResume");
         mViewPager.setResume();
         Utils.hideActionBar(this);
     }
@@ -209,7 +215,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause");
+        LogUtils.d(TAG, "onPause");
         mViewPager.setPause();
         finish();
     }
@@ -218,7 +224,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
+        LogUtils.d(TAG, "onDestroy");
         mViewPager.setDestroy();
         PreloadManager.getInstance(this).removeAllPreloadTask();
         mHandler.removeCallbacksAndMessages(null);
@@ -229,11 +235,26 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
 
     @Override
     public void completedCallback(int tag) {
-        Log.d(TAG, "completedCallback MultiDownload tag = " + tag);
+        LogUtils.d(TAG, "completedCallback MultiDownload tag = " + tag);
         if (Constant.ADVERTISE_DOWNLOAD == tag) {
             Message message = new Message();
             message.what = Constant.DOWNLOAD_COMPLETED;
             mHandler.sendMessageDelayed(message, Constant.DELAY_TIMES);
         }
+    }
+
+    /**
+     * 定期删除过期文件
+     */
+    private void regularlyDelete() {
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, Constant.INDEX_5);
+        calendar.set(Calendar.MINUTE, Constant.INDEX_0);
+        calendar.set(Calendar.SECOND, Constant.INDEX_0);
+        Intent intent = new Intent(Constant.ACTION_DELETE_LOG);
+        PendingIntent pi = PendingIntent.getBroadcast(this, Constant.INDEX_0, intent, PendingIntent.FLAG_IMMUTABLE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                Constant.INDEX_1000 * Constant.INDEX_60 * Constant.INDEX_60 * Constant.INDEX_24, pi);
     }
 }

@@ -183,7 +183,7 @@ public class Utils {
         String path = null;
         File dstFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDefault", sourcePath);
         boolean isFileExists = isDefaultFileExists(sourcePath);
-        Log.d(TAG, "checkDefaultFilePath: isFileExists = " + isFileExists);
+        LogUtils.d(TAG, "checkDefaultFilePath: isFileExists = " + isFileExists);
         if (!isFileExists) {
             path = copyRawFileToExDir(sourcePath, rawId, context);
         } else {
@@ -202,7 +202,7 @@ public class Utils {
         String path = null;
         File downloadFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload", sourcePath);
         boolean isFileExists = isDownloadFileExists(sourcePath);
-        Log.d(TAG, "checkDownloadFilePath: isFileExists = " + isFileExists);
+        LogUtils.d(TAG, "checkDownloadFilePath: isFileExists = " + isFileExists);
         if (!isFileExists) {
             File parentDir = downloadFile.getParentFile();
             if (!parentDir.exists()) {

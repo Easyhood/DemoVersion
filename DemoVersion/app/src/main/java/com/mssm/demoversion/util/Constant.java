@@ -13,6 +13,8 @@ public class Constant {
     // 播放界面结束广播
     public static final String ACTION_DESTROYED = "com.mssm.action.DESTROYED";
 
+    public static final String ACTION_DELETE_LOG = "com.mssm.action.DELETE_LOG";
+
     // 广告UUID key
     public static final String AD_UUID_KEY = "AD_UUID_KEY";
 
@@ -52,5 +54,11 @@ public class Constant {
     public static final int INDEX_0 = 0;
     public static final int INDEX_1 = 1;
     public static final int INDEX_2 = 2;
+    public static final int INDEX_3 = 3;
+    public static final int INDEX_4 = 4;
+    public static final int INDEX_5 = 5;
+    public static final int INDEX_1000 = 1000;
+    public static final int INDEX_60 = 60;
+    public static final int INDEX_24 = 24;
 
 }

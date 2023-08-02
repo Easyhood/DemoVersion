@@ -10,6 +10,7 @@ import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.Advance;
@@ -63,29 +64,29 @@ public class HttpRequest {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
                 AdvertiseModel model = response.body();
                 if (model.getData() == null) {
-                    Log.d(TAG, "onResponse: model.getData() is null");
+                    LogUtils.d(TAG, "onResponse: model.getData() is null");
                     return;
                 }
-                Log.d(TAG, "onResponse: model = " + model.toString());
+                LogUtils.d(TAG, "onResponse: model = " + model.toString());
                 String planId = model.getData().get(Constant.INDEX_0).getPlanId();
                 String spPlanId = SharedPreferencesUtils.getString(mContext, Constant.AD_UUID_KEY);
                 if (planId == null || spPlanId == null) {
-                    Log.d(TAG, "onResponse: planId or spPlanId is null");
+                    LogUtils.d(TAG, "onResponse: planId or spPlanId is null");
                     return;
                 }
                 if (!planId.equals(spPlanId)){
-                    Log.d(TAG, "onResponse: startMultiDownload ");
+                    LogUtils.d(TAG, "onResponse: startMultiDownload ");
                     startMultiDownload(model);
                     SharedPreferencesUtils.putString(mContext, Constant.AD_UUID_KEY, planId);
                 } else {
-                    Log.d(TAG, "onResponse: Not download Cause planId is same as spPlanId : "
+                    LogUtils.d(TAG, "onResponse: Not download Cause planId is same as spPlanId : "
                             + planId);
                 }
             }
 
             @Override
             public void onFailure(Call<AdvertiseModel> call, Throwable t) {
-                Log.d(TAG, "onFailure: Error ! Cause by " + t);
+                LogUtils.d(TAG, "onFailure: Error ! Cause by " + t);
             }
         });
     }
@@ -118,12 +119,12 @@ public class HttpRequest {
      * @param filePath 文件路径
      */
     public void analyzeFileParam(String fileType, String filePath, int filePlayTime) {
-        Log.d(TAG, "analyzeFileParam: fileType = " + fileType + " , filePlayTime = "
+        LogUtils.d(TAG, "analyzeFileParam: fileType = " + fileType + " , filePlayTime = "
                         + filePlayTime + " , filePath = " + filePath);
         StringBuffer sb = new StringBuffer();
         String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
         BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
-                .setPath(MultiDownload.mSaveFolder, true);
+                .setPath(MultiDownload.DOWNLOAD_PATH, true);
         mTask.add(task);
         String localPath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
         if (Constant.IMAGE_TYPE.equals(fileType)) {
@@ -133,7 +134,7 @@ public class HttpRequest {
             Advance videoAdvance = new Advance(localPath, Constant.VIDEO_INDEX, filePlayTime);
             mData.add(videoAdvance);
         } else {
-            Log.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
+            LogUtils.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
         }
     }
     public List<Advance> getData () {

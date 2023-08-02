@@ -29,6 +29,7 @@ import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.presenter.DownloadCompletedListener;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -93,37 +94,37 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         @Override
         public void connectionLost(Throwable cause) {
             //连接丢失后，一般在这里面进行重连
-            Log.d(TAG, "connectionLost : " + getString(R.string.mqtt_connect_lost));
+            LogUtils.d(TAG, "connectionLost : " + getString(R.string.mqtt_connect_lost));
             startReconnect();
         }
 
         @Override
         public void messageArrived(String topic, MqttMessage message) {
             //subscribe后得到的消息会执行到这里面
-            Log.d(TAG, "messageArrived "+ getString(R.string.mqtt_subscribe_message) +" : " + message);
+            LogUtils.d(TAG, "messageArrived "+ getString(R.string.mqtt_subscribe_message) +" : " + message);
             try {
                 Gson gson = new Gson();
                 messageJson = String.valueOf(message.toString().toCharArray());
                 messageJson = messageJson.replaceAll("\\s|\\n", "");
-                Log.d(TAG, "messageArrived: messageJson = " + messageJson);
+                LogUtils.d(TAG, "messageArrived: messageJson = " + messageJson);
                 mqttModel = gson.fromJson(messageJson, MqttModel.class);
                 setMqttModel(mqttModel);
-                Log.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
+                LogUtils.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
                 if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
                     startResMultiDownload(mqttModel);
                 } else if (Constant.END_RT_EVENT.equals(mqttModel.getCmdStr())) {
-                    Log.d(TAG, "messageArrived: getDisplayTime = " + mqttModel.getDisplayTime());
+                    LogUtils.d(TAG, "messageArrived: getDisplayTime = " + mqttModel.getDisplayTime());
                     if (mqttModel.getDisplayTime() != Constant.INDEX_0) {
                         startToEndDisplay(getApplicationContext());
                     } else {
                         startAdvertisePlayActivity(getApplicationContext());
                     }
                 } else {
-                    Log.d(TAG, "messageArrived: mqttModel.getCmdStr() is new");
+                    LogUtils.d(TAG, "messageArrived: mqttModel.getCmdStr() is new");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.d(TAG, "messageArrived: e = " + e);
+                LogUtils.d(TAG, "messageArrived: e = " + e);
             }
 
         }
@@ -131,7 +132,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
             // publish后会执行到这里
-            Log.d(TAG, "deliveryComplete: publish后会执行 =" + token.isComplete());
+            LogUtils.d(TAG, "deliveryComplete: publish后会执行 =" + token.isComplete());
         }
     };
 
@@ -353,12 +354,12 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         String topBgHttpUrlPath = model.getTopLayerModel().getTopBgImageModel().getResUrl();
         localtopBgPath = Utils.checkDownloadFilePath(Utils.getFileName(topBgHttpUrlPath));
         BaseDownloadTask topBgHttpUrlTask = FileDownloader.getImpl().create(topBgHttpUrlPath)
-                .setPath(MultiDownload.mSaveFolder, true);
+                .setPath(MultiDownload.DOWNLOAD_PATH, true);
         mTask.add(topBgHttpUrlTask);
         String topFloatHttpUrlPath = model.getTopLayerModel().getTopFloatImgModel().getResUrl();
         localtopFloatPath = Utils.checkDownloadFilePath(Utils.getFileName(topFloatHttpUrlPath));
         BaseDownloadTask topFloatHttpUrlTask = FileDownloader.getImpl().create(topFloatHttpUrlPath)
-                .setPath(MultiDownload.mSaveFolder, true);
+                .setPath(MultiDownload.DOWNLOAD_PATH, true);
         mTask.add(topFloatHttpUrlTask);
         mMultiDownload.start_multi(mTask, Constant.SCANQRCODE_DOWNLOAD);
     }

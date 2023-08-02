@@ -17,19 +17,19 @@
         android:layout_height="match_parent"/>
     <ImageView
         android:id="@+id/iv_qrcode"
-        android:layout_width="42dp"
-        android:layout_height="95dp"
-        android:layout_marginTop="91dp"
-        android:layout_marginLeft="196dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginLeft="199dp"
         android:src="@drawable/msqr_pg_ex"/>
     <com.mssm.demoversion.view.TimerTextView
         android:id="@+id/tv_timer"
-        android:layout_width="34dp"
-        android:layout_height="68dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="256dp"
+        android:layout_marginTop="18dp"
         android:textColor="@color/sunshine_blue"
         android:fontFamily="@font/youshebiaotihei"
-        android:textSize="16dp" />
+        android:textSize="17dp" />
 
 </RelativeLayout>
