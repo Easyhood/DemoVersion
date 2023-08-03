@@ -37,11 +37,12 @@ public class LogUtils {
             return;
         }
         Date nowTime = new Date(System.currentTimeMillis());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH_mm_ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss:SSS");
         makeRootDirectory(LOG_PATH);
         String filename = "app_log_" + simpleDateFormat.format(nowTime) + ".log";
         String filePath = LOG_PATH + filename;
-        String strContent = simpleDateFormat.format(System.currentTimeMillis()) + "_" + tag + "_" + info + "\r\n";
+        String strContent = logDateFormat.format(System.currentTimeMillis()) + "_" + tag + "_" + info + "\r\n";
         try {
             File file = new File(filePath);
             if (!file.exists()) {

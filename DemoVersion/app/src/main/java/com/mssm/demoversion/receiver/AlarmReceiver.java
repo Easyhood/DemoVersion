@@ -3,7 +3,6 @@ package com.mssm.demoversion.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.exception.MsCrashHandler;
@@ -18,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(TAG, "onReceive: action  is " + action);
+        LogUtils.d(TAG, "onReceive: action  is " + action);
         if (action.equals(Constant.ACTION_DELETE_LOG)) {
             new Thread(new Runnable() {
                 @Override

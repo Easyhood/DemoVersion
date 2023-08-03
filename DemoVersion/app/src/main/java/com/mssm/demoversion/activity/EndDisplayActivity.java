@@ -83,8 +83,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      */
     private void initData() {
         playlist = new ArrayList<>();
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1));
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_3));
+        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av));
         // meidiaplayer对象
         mediaPlayer = new MediaPlayer();
         currentVideoIndex = 0;
@@ -98,7 +97,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
         } else {
             svEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
-            ivEndBg.setImageResource(R.drawable.dlpg_1);
+            ivEndBg.setImageResource(R.drawable.mssq_gold_img);
         }
         tvEndTitle.setText(endTitle);
         new Handler().postDelayed(new Runnable() {
@@ -125,12 +124,19 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
         if (mqttModelStr == null) {
             return;
         }
-        Gson gson = new Gson();
-        String messageJson = String.valueOf(mqttModelStr.toString().toCharArray());
-        messageJson = messageJson.replaceAll("\\s|\\n", "");
-        mqttModel = gson.fromJson(messageJson, MqttModel.class);
-        playTimeL = Long.valueOf((mqttModel.getDisplayTime() + 1) * 1000);
-        endTitle = mqttModel.getEndText();
+        try {
+            Gson gson = new Gson();
+            String messageJson = String.valueOf(mqttModelStr.toString().toCharArray());
+            messageJson = messageJson.replaceAll("\\s|\\n", "");
+            mqttModel = gson.fromJson(messageJson, MqttModel.class);
+            playTimeL = Long.valueOf((mqttModel.getDisplayTime() + 1) * 1000);
+            endTitle = mqttModel.getEndText();
+        } catch (Exception exception) {
+            LogUtils.e(TAG, "initMqttModel: exception is " + exception);
+            startAdvertisePlayActivity(this.getApplicationContext());
+            finish();
+            return;
+        }
     }
 
     @Override
@@ -142,8 +148,10 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
     @Override
@@ -175,7 +183,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
 //
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssm_1);
+                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
                     mediaPlayer.setDataSource(getApplicationContext(), uri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.prepare();

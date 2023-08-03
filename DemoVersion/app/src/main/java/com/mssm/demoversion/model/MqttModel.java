@@ -189,6 +189,10 @@ public class MqttModel {
         @SerializedName("res_url")
         public String resUrl;
 
+        // 资源地址
+        @SerializedName("res_content")
+        public String resContent;
+
         public String getResType() {
             return resType;
         }
@@ -213,6 +217,10 @@ public class MqttModel {
             return resUrl;
         }
 
+        public String getResContent() {
+            return resContent;
+        }
+
         @Override
         public String toString() {
             return "TopFloatImgModel{" +
@@ -222,6 +230,7 @@ public class MqttModel {
                     ", displayWidth=" + displayWidth +
                     ", displayHeight=" + displayHeight +
                     ", resUrl='" + resUrl + '\'' +
+                    ", resContent='" + resContent + '\'' +
                     '}';
         }
     }

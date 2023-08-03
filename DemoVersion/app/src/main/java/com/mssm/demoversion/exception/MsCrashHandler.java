@@ -29,7 +29,7 @@ import java.util.Date;
  **/
 public class MsCrashHandler implements Thread.UncaughtExceptionHandler {
 
-    public static final String CRASH_PATH = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
+    public static final String CRASH_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSM_crash_logInfo/";
 
     private static final String TAG = "MsCrashHandler";
 

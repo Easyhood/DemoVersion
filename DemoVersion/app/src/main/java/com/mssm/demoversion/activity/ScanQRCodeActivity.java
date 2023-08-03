@@ -31,6 +31,7 @@ import com.mssm.demoversion.model.MqttModel;
 import com.mssm.demoversion.presenter.TimerComputedListener;
 import com.mssm.demoversion.services.MsMqttService;
 import com.mssm.demoversion.util.CallBackUtils;
+import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.TimerTextView;
@@ -110,26 +111,40 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         LogUtils.d(TAG, "init");
         initMqttModel();
         playlist = new ArrayList<>();
-        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1));
+        playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av));
+        initView();
+    }
 
+    /**
+     * 初始化View
+     */
+    private void initView() {
         // 播放视频预览界面
         surfaceVideo = findViewById(R.id.surface_video);
         rlScanQRCode= findViewById(R.id.rl_scanqrcode);
         ivQrCodeBg = findViewById(R.id.iv_qrcodebg);
-        ivQrCodeBg.setVisibility(View.GONE);
         ivQrCode = findViewById(R.id.iv_qrcode);
         tvTimer = findViewById(R.id.tv_timer);
         // initTopBgImage();
         // initScanQRCodeImage();
         // 设置点击事件
-        surfaceVideo.setOnClickListener(this::onClick);
-        // meidiaplayer对象
-        mediaPlayer = new MediaPlayer();
-        currentVideoIndex = 0;
-        // 设置准备监听
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
-        startPlay();
+        String typeEvent = mqttModel.getBgLayerModel().getBgResType();
+        if (Constant.VIDEO_TYPE.equals(typeEvent)) {
+            ivQrCodeBg.setVisibility(View.GONE);
+            surfaceVideo.setVisibility(View.VISIBLE);
+            surfaceVideo.setOnClickListener(this::onClick);
+            // meidiaplayer对象
+            mediaPlayer = new MediaPlayer();
+            currentVideoIndex = 0;
+            // 设置准备监听
+            mediaPlayer.setOnPreparedListener(this);
+            mediaPlayer.setOnCompletionListener(this);
+            startPlay();
+        } else {
+            surfaceVideo.setVisibility(View.GONE);
+            ivQrCodeBg.setVisibility(View.VISIBLE);
+        }
+
         initQRCode();
         tvTimer.setTimes(playTimeL);
         tvTimer.beginRun();
@@ -152,11 +167,18 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         if (mqttModelStr == null) {
             return;
         }
-        Gson gson = new Gson();
-        String messageJson = String.valueOf(mqttModelStr.toString().toCharArray());
-        messageJson = messageJson.replaceAll("\\s|\\n", "");
-        mqttModel = gson.fromJson(messageJson, MqttModel.class);
-        playTimeL = Long.valueOf(mqttModel.getDisplayTime() + 1);
+        try {
+            Gson gson = new Gson();
+            String messageJson = String.valueOf(mqttModelStr.toString().toCharArray());
+            messageJson = messageJson.replaceAll("\\s|\\n", "");
+            mqttModel = gson.fromJson(messageJson, MqttModel.class);
+            playTimeL = Long.valueOf(mqttModel.getDisplayTime() + 1);
+        } catch (Exception exception) {
+            LogUtils.e(TAG, "initMqttModel: exception is " + exception);
+            startAdvertisePlayActivity(this.getApplicationContext());
+            finish();
+            return;
+        }
     }
 
     /**
@@ -180,8 +202,9 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         Map<EncodeHintType, String> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        hints.put(EncodeHintType.MARGIN, "0");
         BitMatrix encode = null;
-        qrUrl = mqttModel.getTopLayerModel().getTopFloatImgModel().getResUrl();
+        qrUrl = mqttModel.getTopLayerModel().getTopFloatImgModel().getResContent();
         try {
             encode = qrCodeWriter.encode(qrUrl, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
         } catch (WriterException exception) {
@@ -267,7 +290,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
 //
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_1);
+                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
                     mediaPlayer.setDataSource(getApplicationContext(), uri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.prepare();
@@ -323,8 +346,10 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     protected void onDestroy() {
         super.onDestroy();
         tvTimer.stopRun();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
     @Override

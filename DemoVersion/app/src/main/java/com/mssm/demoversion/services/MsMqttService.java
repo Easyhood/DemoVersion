@@ -73,7 +73,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     private String userName = "test_server"; //mqtt用户名称
     private String passWord = "test_server";//mqtt用户密码
     private String mqtt_id = "mqttx_9baa666f";//mqtt id
-    private String mqtt_sub_topic = "ad_service_to_device";//mqtt订阅的主题的标识
+    private String mqtt_sub_topic = "ad_service_to_device_" + Utils.getCapitalDeviceSnNumber();// mqtt订阅的主题的标识
     private String mqtt_pub_topic = "well/1123/0";//mqtt你发布的主题的标识
 
     public MsMqttService() {
@@ -122,9 +122,10 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
                 } else {
                     LogUtils.d(TAG, "messageArrived: mqttModel.getCmdStr() is new");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtils.d(TAG, "messageArrived: e = " + e);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                LogUtils.e(TAG, "messageArrived: exception is " + exception);
+                return;
             }
 
         }

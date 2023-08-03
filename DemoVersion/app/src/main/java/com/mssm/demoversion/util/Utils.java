@@ -258,7 +258,19 @@ public class Utils {
     public static String getDeviceSnNumber() {
         String serialNumberStr = "1E3D79E9E60F3625";
         // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
-        // serialNumber = yfapiManager.yfgetSerialNumber();
+        // serialNumberStr = yfapiManager.yfgetSerialNumber();
+        return serialNumberStr;
+    }
+
+    /**
+     * 获取当前设备SN号
+     * @return serialNumber
+     */
+    public static String getCapitalDeviceSnNumber() {
+        String serialNumberStr = "1E3D79E9E60F3625";
+        yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+        serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
+        Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
         return serialNumberStr;
     }
 
