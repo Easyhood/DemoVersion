@@ -58,7 +58,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     public MqttModel mqttModel;
 
     private String channelId = "null";
-    private Handler handler;
+    private Handler mHandler;
     private MqttClient client;
     private MqttConnectOptions options;
     private MultiDownload mMultiDownload;
@@ -67,6 +67,8 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     private List<BaseDownloadTask> mTask;
     private String localtopBgPath;
     private String localtopFloatPath;
+
+    private boolean isReceived = false;
 
     //这些都写你自己的或者找个测试的地址
     private String host = "TCP://test-mqtt.woozatop.com:1883";     // TCP协议
@@ -96,12 +98,21 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
             //连接丢失后，一般在这里面进行重连
             LogUtils.d(TAG, "connectionLost : " + getString(R.string.mqtt_connect_lost));
             startReconnect();
+            isReceived = false;
         }
 
         @Override
         public void messageArrived(String topic, MqttMessage message) {
             //subscribe后得到的消息会执行到这里面
             LogUtils.d(TAG, "messageArrived "+ getString(R.string.mqtt_subscribe_message) +" : " + message);
+            LogUtils.d(TAG, "messageArrived: isReceived = " + isReceived);
+            if (isReceived) {
+                return;
+            }
+            if (!isReceived) {
+                isReceived = true;
+                protectMqttReceiver();
+            }
             try {
                 Gson gson = new Gson();
                 messageJson = String.valueOf(message.toString().toCharArray());
@@ -141,6 +152,7 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     public void onCreate() {
         super.onCreate();
         CallBackUtils.setListener(this);
+        mHandler = new Handler();
         // 8.0 以上需要特殊处理
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channelId = createNotificationChannel("com.mssm.mqtt",
@@ -158,6 +170,12 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         startForeground(NOTIFICATION_ID, notification);
         mMultiDownload = new MultiDownload();
         mqttInit();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -363,5 +381,14 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
                 .setPath(MultiDownload.DOWNLOAD_PATH, true);
         mTask.add(topFloatHttpUrlTask);
         mMultiDownload.start_multi(mTask, Constant.SCANQRCODE_DOWNLOAD);
+    }
+
+    private void protectMqttReceiver() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isReceived = false;
+            }
+        }, Constant.PROTECT_DELAY_TIMES);
     }
 }

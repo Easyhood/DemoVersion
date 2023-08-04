@@ -91,13 +91,14 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
         if (mqttModel.getBgLayerModel().getBgResType().equals(Constant.VIDEO_TYPE)) {
-            svEndBg.setVisibility(View.VISIBLE);
-            ivEndBg.setVisibility(View.INVISIBLE);
-            startPlay();
+            // svEndBg.setVisibility(View.VISIBLE);
+            svEndBg.setVisibility(View.INVISIBLE);
+            ivEndBg.setVisibility(View.VISIBLE);
+            // startPlay();
         } else {
             svEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
-            ivEndBg.setImageResource(R.drawable.mssq_gold_img);
+            // ivEndBg.setImageResource(R.drawable.mssq_gold_img);
         }
         tvEndTitle.setText(endTitle);
         new Handler().postDelayed(new Runnable() {
@@ -147,11 +148,12 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer = null;
         }
+        super.onDestroy();
     }
 
     @Override
@@ -186,7 +188,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
                     Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
                     mediaPlayer.setDataSource(getApplicationContext(), uri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.prepare();
+                    mediaPlayer.prepareAsync();
                     mediaPlayer.setDisplay(svEndBg.getHolder());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -221,7 +223,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
             mediaPlayer.setDataSource(getApplicationContext(), nextVideoUri);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDisplay(svEndBg.getHolder()); // surfaceHolder 是用于显示视频的SurfaceHolder对象
-            mediaPlayer.prepare();
+            mediaPlayer.prepareAsync();
             mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();

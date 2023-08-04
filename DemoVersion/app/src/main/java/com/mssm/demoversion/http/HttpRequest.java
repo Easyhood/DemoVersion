@@ -56,7 +56,7 @@ public class HttpRequest {
         // 创建接口实现类
         AdvertiseInterface advertiseInterface = retrofit.create(AdvertiseInterface.class);
         // 通过接口实现类返回call对象
-        Call<AdvertiseModel> adCall = advertiseInterface.getAdvertisePlan(Utils.getDeviceSnNumber());
+        Call<AdvertiseModel> adCall = advertiseInterface.getAdvertisePlan(Utils.getCapitalDeviceSnNumber());
         // 通过Call执行请求
         adCall.enqueue(new Callback<AdvertiseModel>() {
             @Override

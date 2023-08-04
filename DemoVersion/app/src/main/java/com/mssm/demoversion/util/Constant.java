@@ -37,6 +37,8 @@ public class Constant {
      */
     // 广告更新时间
     public static final long DELAY_TIMES = 2000L;
+
+    public static final long PROTECT_DELAY_TIMES = 5000L;
     // 下载未完成
     public static final int DOWNLOAD_NOT = 0;
     // 下载完成
@@ -60,5 +62,10 @@ public class Constant {
     public static final int INDEX_1000 = 1000;
     public static final int INDEX_60 = 60;
     public static final int INDEX_24 = 24;
+
+    // 宝箱值
+    public static final int BOX_BLACK_VALUE = 0;
+    public static final int BOX_BLUE_VALUE = 1;
+    public static final int BOX_GOLD_VALUE = 2;
 
 }

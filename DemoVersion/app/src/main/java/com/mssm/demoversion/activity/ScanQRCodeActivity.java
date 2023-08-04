@@ -125,12 +125,14 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         ivQrCodeBg = findViewById(R.id.iv_qrcodebg);
         ivQrCode = findViewById(R.id.iv_qrcode);
         tvTimer = findViewById(R.id.tv_timer);
+        ivQrCode.setVisibility(View.INVISIBLE);
+        tvTimer.setVisibility(View.INVISIBLE);
         // initTopBgImage();
         // initScanQRCodeImage();
         // 设置点击事件
         String typeEvent = mqttModel.getBgLayerModel().getBgResType();
         if (Constant.VIDEO_TYPE.equals(typeEvent)) {
-            ivQrCodeBg.setVisibility(View.GONE);
+            ivQrCodeBg.setVisibility(View.INVISIBLE);
             surfaceVideo.setVisibility(View.VISIBLE);
             surfaceVideo.setOnClickListener(this::onClick);
             // meidiaplayer对象
@@ -141,13 +143,12 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
             mediaPlayer.setOnCompletionListener(this);
             startPlay();
         } else {
-            surfaceVideo.setVisibility(View.GONE);
+            surfaceVideo.setVisibility(View.INVISIBLE);
             ivQrCodeBg.setVisibility(View.VISIBLE);
+            setIvQrCodeBg();
         }
 
         initQRCode();
-        tvTimer.setTimes(playTimeL);
-        tvTimer.beginRun();
     }
 
     /**
@@ -265,6 +266,11 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     public void onPrepared(MediaPlayer mp) {
         LogUtils.d(TAG, "onPrepared: Easyhood");
         mediaPlayer.start();
+        ivQrCode.setVisibility(View.VISIBLE);
+        tvTimer.setVisibility(View.VISIBLE);
+        tvTimer.setTimes(playTimeL);
+        tvTimer.beginRun();
+
     }
 
     /**
@@ -289,11 +295,10 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
                 LogUtils.d(TAG, "surfaceCreated: Easyhood");
                 //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
                 try {
-//
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
+                    Uri uri = getBoxUri();
                     mediaPlayer.setDataSource(getApplicationContext(), uri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.prepare();
+                    mediaPlayer.prepareAsync();
                     mediaPlayer.setDisplay(surfaceVideo.getHolder());
                     mediaPlayer.setLooping(true);
                 } catch (IOException e) {
@@ -329,7 +334,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
             mediaPlayer.setDataSource(getApplicationContext(), nextVideoUri);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDisplay(surfaceVideo.getHolder()); // surfaceHolder 是用于显示视频的SurfaceHolder对象
-            mediaPlayer.prepare();
+            mediaPlayer.prepareAsync();
             mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -344,12 +349,13 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         tvTimer.stopRun();
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer = null;
         }
+        super.onDestroy();
     }
 
     @Override
@@ -371,6 +377,47 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
             Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(activityIntent);
+        }
+    }
+
+    /**
+     * 获取宝箱视频Uri
+     * @return boxUri
+     */
+    private Uri getBoxUri() {
+        Uri boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+        if (mqttModel == null) {
+            return boxUri;
+        }
+        int boxValue = mqttModel.getBgLayerModel().getBgStartResName();
+        if (Constant.BOX_BLACK_VALUE == boxValue) {
+            boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+        } else if (Constant.BOX_BLUE_VALUE == boxValue) {
+            boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_blue_av);
+        } else if (Constant.BOX_GOLD_VALUE == boxValue) {
+            boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
+        } else {
+            boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+        }
+        return boxUri;
+    }
+
+    /**
+     * 设置背景图片
+     */
+    private void setIvQrCodeBg() {
+        if (mqttModel == null) {
+            return;
+        }
+        int boxValue = mqttModel.getBgLayerModel().getBgStartResName();
+        if (Constant.BOX_BLACK_VALUE == boxValue) {
+            ivQrCodeBg.setImageResource(R.drawable.mssq_black_img);
+        } else if (Constant.BOX_BLUE_VALUE == boxValue) {
+            ivQrCodeBg.setImageResource(R.drawable.mssq_blue_img);
+        } else if (Constant.BOX_GOLD_VALUE == boxValue) {
+            ivQrCodeBg.setImageResource(R.drawable.mssq_gold_img);
+        } else {
+            ivQrCodeBg.setImageResource(R.drawable.mssq_black_img);
         }
     }
 

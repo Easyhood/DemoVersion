@@ -82,13 +82,13 @@ public class MqttModel {
 
         // 背景资源名字
         @SerializedName("bg_start_res_name")
-        public String bgStartResName;
+        public int bgStartResName;
 
         public String getBgResType() {
             return bgResType;
         }
 
-        public String getBgStartResName() {
+        public int getBgStartResName() {
             return bgStartResName;
         }
 

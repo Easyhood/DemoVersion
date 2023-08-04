@@ -12,7 +12,7 @@
         android:layout_height="match_parent"/>
     <ImageView
         android:id="@+id/iv_qrcodebg"
-        android:src="@drawable/mssq_gold_img"
+        android:src="@drawable/mssq_black_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <ImageView
