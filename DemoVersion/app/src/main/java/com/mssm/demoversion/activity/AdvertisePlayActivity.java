@@ -2,15 +2,23 @@ package com.mssm.demoversion.activity;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
+import android.text.InputFilter;
+import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -256,5 +264,57 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         PendingIntent pi = PendingIntent.getBroadcast(this, Constant.INDEX_0, intent, PendingIntent.FLAG_IMMUTABLE);
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 Constant.INDEX_1000 * Constant.INDEX_60 * Constant.INDEX_60 * Constant.INDEX_24, pi);
+    }
+    //定义一个数组，需要监听几次点击事件数组的长度就为多少
+    long[] mHints = new long[8];//初始全部为0
+    @Override
+    public void onBackPressed() {
+        //将mHints数组内的所有元素左移一个位置
+        System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
+        //获得当前系统已经启动的时间
+        mHints[mHints.length - 1] = SystemClock.uptimeMillis();
+        if(SystemClock.uptimeMillis()-mHints[0]<= 5000) {
+            DialogSeven();
+        }
+    }
+
+    /**
+     * 返回到系统桌面
+     */
+    private void startToSystemLauncher() {
+        Intent intent = new Intent();
+        intent.setClassName("com.android.launcher3",
+                "com.android.launcher3.uioverrides.QuickstepLauncher");
+        startActivity(intent);
+    }
+
+    /**
+     * 编辑dialog
+     */
+    public void DialogSeven() {
+        final EditText editText = new EditText(AdvertisePlayActivity.this);
+        editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        editText.setMaxLines(Constant.INDEX_1);
+        editText.setMaxEms(Constant.INDEX_10);
+        editText.setMaxWidth(Constant.INDEX_10);
+        editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constant.INDEX_10)});
+        AlertDialog.Builder inputDialog = new AlertDialog.Builder(AdvertisePlayActivity.this, R.style.MyAlertDialogStyle);
+        inputDialog.setTitle(getString(R.string.exit_launcher_password)).setView(editText);
+        inputDialog.setPositiveButton(getString(R.string.exit_launcher_sure),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String enter = editText.getText().toString();
+                        if (Constant.EXIT_PASSWORD.equals(enter)){
+                            startToSystemLauncher();
+                        }
+                    }
+                });
+        AlertDialog dialog = inputDialog.create();
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = Constant.INDEX_20;
+        params.height = Constant.INDEX_20;
+        dialog.getWindow().setAttributes(params);
+        dialog.show();
     }
 }

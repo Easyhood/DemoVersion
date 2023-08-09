@@ -29,4 +29,7 @@
     <string name="pre_load_end">" 預加載結束: "</string>
     <string name="timer_compute_run">" 倒計時："</string>
     <string name="timer_compute_end">"倒計時結束"</string>
+
+    <string name="exit_launcher_password">"退出密碼："</string>
+    <string name="exit_launcher_sure">"確定"</string>
 </resources>

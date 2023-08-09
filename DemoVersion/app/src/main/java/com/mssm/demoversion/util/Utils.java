@@ -281,4 +281,12 @@ public class Utils {
         return mFileName;
     }
 
+    /**
+     * 设置默认桌面
+     */
+    public static void setHomeLauncher(){
+        yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+        yfapiManager.systemShell("shell cmd package set-home-activity \"com.mssm.demoversion/com.mssm.demoversion.activity.AdvertisePlayActivity\" ");
+    }
+
 }

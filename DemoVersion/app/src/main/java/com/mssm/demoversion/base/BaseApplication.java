@@ -8,6 +8,7 @@ import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.liulishuo.filedownloader.services.DownloadMgrInitialParams;
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.Utils;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
@@ -43,6 +44,7 @@ public class BaseApplication extends Application {
         initFileDownload();
         MsCrashHandler.getInstance().init(getInstances().getApplicationContext());
         initBuglySetting();
+        Utils.setHomeLauncher();
     }
 
     /**

@@ -10,6 +10,8 @@ public class Constant {
     // Bugly的APPID
     public static final String BUGLY_APPID = "e20b968e06";
 
+    public static final String EXIT_PASSWORD = "722405";
+
     // 播放界面结束广播
     public static final String ACTION_DESTROYED = "com.mssm.action.DESTROYED";
 
@@ -44,7 +46,7 @@ public class Constant {
     // 下载完成
     public static final int DOWNLOAD_COMPLETED = 1;
 
-    public static final long DELAY_MILLIS = 32000L;
+    public static final long DELAY_MILLIS = 60000L;
 
     // 扫码通知标识
     // 扫码播放标识
@@ -59,9 +61,12 @@ public class Constant {
     public static final int INDEX_3 = 3;
     public static final int INDEX_4 = 4;
     public static final int INDEX_5 = 5;
-    public static final int INDEX_1000 = 1000;
-    public static final int INDEX_60 = 60;
+    public static final int INDEX_8 = 8;
+    public static final int INDEX_10 = 10;
+    public static final int INDEX_20 = 20;
     public static final int INDEX_24 = 24;
+    public static final int INDEX_60 = 60;
+    public static final int INDEX_1000 = 1000;
 
     // 宝箱值
     public static final int BOX_BLACK_VALUE = 0;
