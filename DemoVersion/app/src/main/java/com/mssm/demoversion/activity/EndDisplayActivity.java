@@ -173,6 +173,11 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
         LogUtils.d(TAG, "onClick: Easyhood");
     }
 
+    @Override
+    public void onBackPressed() {
+       // super.onBackPressed();
+    }
+
     /**
      * 开始播放视频
      */

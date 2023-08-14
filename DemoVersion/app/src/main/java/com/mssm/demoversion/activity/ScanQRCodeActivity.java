@@ -359,6 +359,11 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     }
 
     @Override
+    public void onBackPressed() {
+       // super.onBackPressed();
+    }
+
+    @Override
     public void ComputedCallBack(long secondTime) {
         LogUtils.d(TAG, "ComputedCallBack " + getString(R.string.timer_compute_end));
         startAdvertisePlayActivity(getApplicationContext());

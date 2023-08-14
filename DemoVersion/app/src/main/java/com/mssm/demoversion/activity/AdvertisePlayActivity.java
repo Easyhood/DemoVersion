@@ -51,6 +51,9 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
 
     private static final String TAG = "AdvertisePlayActivity";
 
+    //定义一个数组，需要监听几次点击事件数组的长度就为多少
+    private long[] mHints = new long[Constant.INDEX_8];// 初始全部为0
+
     private List<Advance> data = new ArrayList<>();
 
     private AdvanceView mViewPager;
@@ -265,8 +268,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 Constant.INDEX_1000 * Constant.INDEX_60 * Constant.INDEX_60 * Constant.INDEX_24, pi);
     }
-    //定义一个数组，需要监听几次点击事件数组的长度就为多少
-    long[] mHints = new long[8];//初始全部为0
+
     @Override
     public void onBackPressed() {
         //将mHints数组内的所有元素左移一个位置

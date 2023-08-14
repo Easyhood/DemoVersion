@@ -14,7 +14,8 @@
         android:id="@+id/iv_qrcodebg"
         android:src="@drawable/mssq_black_img"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="invisible"/>
     <ImageView
         android:id="@+id/iv_qrcode"
         android:layout_width="71dp"

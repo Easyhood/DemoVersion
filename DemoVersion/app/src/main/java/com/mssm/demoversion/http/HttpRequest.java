@@ -62,8 +62,12 @@ public class HttpRequest {
             @Override
             public void onResponse(Call<AdvertiseModel> call, Response<AdvertiseModel> response) {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
+                if (response == null) {
+                    Log.d(TAG, "onResponse: response is null !");
+                    return;
+                }
                 AdvertiseModel model = response.body();
-                if (model.getData() == null) {
+                if (model == null || model.getData() == null) {
                     LogUtils.d(TAG, "onResponse: model.getData() is null");
                     return;
                 }

@@ -38,7 +38,12 @@ public class AdvanceImageView extends RelativeLayout {
     }
 
     public void setImage(String path) {
-        Glide.with(getContext()).load(path).into(imageView);
+        if (getContext() == null || path == null) {
+            return;
+        }
+        if (imageView != null && imageView.getContext() != null) {
+            Glide.with(getContext()).load(path).into(imageView);
+        }
     }
 
 }
