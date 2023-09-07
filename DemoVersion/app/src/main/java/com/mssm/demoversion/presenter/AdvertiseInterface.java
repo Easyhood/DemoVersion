@@ -5,6 +5,7 @@ import com.mssm.demoversion.model.AdvertiseModel;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * @author Easyhood
@@ -13,14 +14,15 @@ import retrofit2.http.Path;
  **/
 public interface AdvertiseInterface {
     //定义了需要实现的方法
-    // https://test-admin.woozatop.com/ad/device_current_ad_plan/1E3D79E9E60F3625
-    public static String BASE_URL = "https://test-admin.woozatop.com/";
+    // https://test-admin.woozatop.com/ad/device_current_ad_plan/351E6E49C2A14683
+    // https://test-ad.woozatop.com/ad/api/equipment_ad/351E6E49C2A14683
+    public static String BASE_URL = "https://test-ad.woozatop.com";
 
     /**
      * 获取服务器广告轮播计划
      * @return
      */
-    @GET("ad/device_current_ad_plan/{sn_number}")
+    @GET("/ad/api/equipment_ad/{sn_number}")
     public Call<AdvertiseModel> getAdvertisePlan(@Path("sn_number") String snNumberStr);
 
 }

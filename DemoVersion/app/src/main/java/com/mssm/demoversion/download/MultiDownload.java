@@ -31,7 +31,7 @@ public class MultiDownload {
     /**
      * DOWNLOAD_PATH 下载地址
      */
-    public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMDownload/";
+    public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMDownload";
 
     public FileDownloadListener createLis(int tag) {
         return new FileDownloadSampleListener() {

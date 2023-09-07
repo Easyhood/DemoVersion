@@ -1,11 +1,10 @@
 package com.mssm.demoversion.base;
 
 import android.app.Application;
+import android.content.Context;
 
-import com.google.android.material.circularreveal.CircularRevealHelper;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
-import com.liulishuo.filedownloader.services.DownloadMgrInitialParams;
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.Utils;
@@ -27,6 +26,8 @@ public class BaseApplication extends Application {
     private static final String TAG = "BaseApplication";
     public static BaseApplication instances;
 
+    public static Context mContext;
+
     private static YF_RK356x_API_Manager yfapiManager;
 
     // private HttpProxyCacheServer proxy;
@@ -34,9 +35,14 @@ public class BaseApplication extends Application {
         return instances;
     }
 
+    public static Context getContext() {
+        return mContext;
+    }
+
     public void onCreate() {
         super.onCreate();
         instances = this;
+        mContext = this.getApplicationContext();
         yfapiManager = new YF_RK356x_API_Manager(getInstances());
 
         AutoSize.initCompatMultiProcess(this);
@@ -81,4 +87,5 @@ public class BaseApplication extends Application {
                 ))
                 .commit();
     }
+
 }

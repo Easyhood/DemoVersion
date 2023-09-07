@@ -121,6 +121,8 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
      * 初始化数据
      */
     private void initData() {
+        SharedPreferencesUtils.putString(mContext, Constant.AD_UUID_KEY,
+                Constant.AD_UUID_KEY);
         initDefaultData();
         startCycleRequest();
     }
@@ -260,7 +262,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     private void regularlyDelete() {
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, Constant.INDEX_5);
+        calendar.set(Calendar.HOUR_OF_DAY, Constant.INDEX_14);
         calendar.set(Calendar.MINUTE, Constant.INDEX_0);
         calendar.set(Calendar.SECOND, Constant.INDEX_0);
         Intent intent = new Intent(Constant.ACTION_DELETE_LOG);

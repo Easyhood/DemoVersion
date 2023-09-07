@@ -218,7 +218,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
                 if (encode.get(i, j)) {
                     colors[i * qrWidth + j] = Color.WHITE;
                 } else {
-                    colors[i * qrWidth + j] = getColor(R.color.treasure_drak_black);
+                    colors[i * qrWidth + j] = Constant.TREASURE_DARK_BLACK;
                 }
             }
         }

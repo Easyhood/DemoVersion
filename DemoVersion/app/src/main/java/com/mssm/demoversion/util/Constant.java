@@ -26,6 +26,9 @@ public class Constant {
     // 二维码互动页面下载请求
     public static final int SCANQRCODE_DOWNLOAD = 10002;
 
+    // 二维码定制颜色
+    public static final int TREASURE_DARK_BLACK = 0xFF040413;
+
     // 图片类型
     public static final String IMAGE_TYPE = "image";
     public static final String IMAGE_INDEX = "2";
@@ -63,7 +66,9 @@ public class Constant {
     public static final int INDEX_5 = 5;
     public static final int INDEX_8 = 8;
     public static final int INDEX_10 = 10;
+    public static final int INDEX_14 = 14;
     public static final int INDEX_20 = 20;
+    public static final int INDEX_23 = 23;
     public static final int INDEX_24 = 24;
     public static final int INDEX_60 = 60;
     public static final int INDEX_1000 = 1000;

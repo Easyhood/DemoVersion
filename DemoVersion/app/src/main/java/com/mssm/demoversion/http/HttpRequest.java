@@ -9,15 +9,18 @@ import com.mssm.demoversion.base.BaseApplication;
 import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
+import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.Advance;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,7 +51,11 @@ public class HttpRequest {
      * 请求广告播放计划
      */
     public void requestAdvertisePlan() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.sslSocketFactory(Utils.createSSLSocketFactory(), new Utils.TrustAllCerts());
+        builder.hostnameVerifier(new Utils.TrustAllHostnameVerifier());
         Retrofit retrofit = new Retrofit.Builder()
+                .client(builder.build())
                 .baseUrl(AdvertiseInterface.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build(); // 创建Retrofit实体类
@@ -67,7 +74,7 @@ public class HttpRequest {
                     return;
                 }
                 AdvertiseModel model = response.body();
-                if (model == null || model.getData() == null) {
+                if (model == null || model.getData() == null || model.getData().size() < Constant.INDEX_1) {
                     LogUtils.d(TAG, "onResponse: model.getData() is null");
                     return;
                 }
@@ -113,7 +120,12 @@ public class HttpRequest {
                 analyzeFileParam(fileType, filePath, filePlayTime);
             }
         }
-    mMultiDownload.start_multi(mTask, Constant.ADVERTISE_DOWNLOAD);
+        if (mTask.size() > Constant.INDEX_0) {
+            mMultiDownload.start_multi(mTask, Constant.ADVERTISE_DOWNLOAD);
+        } else {
+            CallBackUtils.doCallBackMethod(Constant.ADVERTISE_DOWNLOAD);
+        }
+
     }
 
 
@@ -129,8 +141,13 @@ public class HttpRequest {
         String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
         BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
                 .setPath(MultiDownload.DOWNLOAD_PATH, true);
-        mTask.add(task);
         String localPath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
+        LogUtils.d(TAG, "analyzeFileParam: localPath = " + localPath);
+        File checkFile = new File(localPath);
+        LogUtils.d(TAG, "analyzeFileParam: checkFile Exists = " + checkFile.exists());
+        if (!checkFile.exists()) {
+            mTask.add(task);
+        }
         if (Constant.IMAGE_TYPE.equals(fileType)) {
             Advance imageAdvance = new Advance(localPath, Constant.IMAGE_INDEX, filePlayTime);
             mData.add(imageAdvance);

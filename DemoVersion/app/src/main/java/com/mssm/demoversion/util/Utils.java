@@ -24,7 +24,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * @author Easyhood
@@ -101,7 +111,8 @@ public class Utils {
      * @return 文件是否存在
      */
     public static boolean isDownloadFileExists(String sourcePath) {
-        File file = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload", sourcePath);
+        Log.d(TAG, "isDownloadFileExists: sourcePath = " + sourcePath);
+        File file = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload/", sourcePath);
         if (!file.getParentFile().exists()) {
             return false;
         }
@@ -275,9 +286,11 @@ public class Utils {
     }
 
     public static String getFileName(String sourcePath){
+        LogUtils.d(TAG, "getFileName: sourcePath = " + sourcePath);
         String mFileName = "";
         int index = sourcePath.lastIndexOf("/");
         mFileName = sourcePath.substring(index + Constant.INDEX_1);
+        LogUtils.d(TAG, "getFileName: mFileName = " + mFileName);
         return mFileName;
     }
 
@@ -287,6 +300,48 @@ public class Utils {
     public static void setHomeLauncher(){
         yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
         yfapiManager.systemShell("shell cmd package set-home-activity \"com.mssm.demoversion/com.mssm.demoversion.activity.AdvertisePlayActivity\" ");
+    }
+
+    /**
+     * 自定义SS验证相关类
+     */
+    public static class TrustAllCerts implements X509TrustManager {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            LogUtils.d(TAG, "checkClientTrusted: authType = " + authType);
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            LogUtils.d(TAG, "checkServerTrusted: authType = " + authType);
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            LogUtils.d(TAG, "getAcceptedIssuers");
+            return new X509Certificate[0];
+        }
+    }
+
+    public static class TrustAllHostnameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            LogUtils.d(TAG, "verify: hostname = " + hostname);
+            return true;
+        }
+    }
+
+    public static SSLSocketFactory createSSLSocketFactory() {
+        SSLSocketFactory ssfFactory = null;
+        LogUtils.d(TAG, "createSSLSocketFactory");
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new X509TrustManager[]{new TrustAllCerts()}, new SecureRandom());
+            ssfFactory = sc.getSocketFactory();
+        } catch (Exception e) {
+            LogUtils.d(TAG, "createSSLSocketFactory: Exception is " + e);
+        }
+        return ssfFactory;
     }
 
 }

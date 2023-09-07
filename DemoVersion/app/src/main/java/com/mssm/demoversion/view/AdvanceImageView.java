@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.mssm.demoversion.base.BaseApplication;
 
 /**
  * @author Easyhood
@@ -42,7 +43,7 @@ public class AdvanceImageView extends RelativeLayout {
             return;
         }
         if (imageView != null && imageView.getContext() != null) {
-            Glide.with(getContext()).load(path).into(imageView);
+            Glide.with(BaseApplication.getContext()).load(path).into(imageView);
         }
     }
 
