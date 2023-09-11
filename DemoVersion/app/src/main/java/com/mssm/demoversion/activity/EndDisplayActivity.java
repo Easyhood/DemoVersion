@@ -2,19 +2,16 @@ package com.mssm.demoversion.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -24,7 +21,6 @@ import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,19 +29,15 @@ import java.util.List;
  * @desciption 互动结束界面
  * @since 2023/7/14
  **/
-public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnPreparedListener, View.OnClickListener{
+public class EndDisplayActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "EndDisplayActivity";
 
-    private SurfaceView svEndBg;
+    private VideoView videoEndBg;
 
     private ImageView ivEndBg;
 
     private TextView tvEndTitle;
-
-    // meidiaplayer对象
-    private MediaPlayer mediaPlayer;
 
     private MqttModel mqttModel;
 
@@ -71,11 +63,11 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      * 初始化View
      */
     private void initView() {
-        svEndBg = findViewById(R.id.sv_end_bg);
+        videoEndBg = findViewById(R.id.video_end_bg);
         ivEndBg = findViewById(R.id.iv_end_bg);
         tvEndTitle = findViewById(R.id.tv_end_title);
         // 设置点击事件
-        svEndBg.setOnClickListener(this::onClick);
+        videoEndBg.setOnClickListener(this::onClick);
     }
 
     /**
@@ -84,19 +76,14 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
     private void initData() {
         playlist = new ArrayList<>();
         playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av));
-        // meidiaplayer对象
-        mediaPlayer = new MediaPlayer();
         currentVideoIndex = 0;
-        // 设置准备监听
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
         if (mqttModel.getBgLayerModel().getBgResType().equals(Constant.VIDEO_TYPE)) {
-            // svEndBg.setVisibility(View.VISIBLE);
-            svEndBg.setVisibility(View.INVISIBLE);
+            // videoEndBg.setVisibility(View.VISIBLE);
+            videoEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
             // startPlay();
         } else {
-            svEndBg.setVisibility(View.INVISIBLE);
+            videoEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
             // ivEndBg.setImageResource(R.drawable.mssq_gold_img);
         }
@@ -148,24 +135,12 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     protected void onDestroy() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if (videoEndBg != null && videoEndBg.isPlaying()) {
+            videoEndBg.pause();
+            videoEndBg.stopPlayback();
+            videoEndBg.suspend();
         }
         super.onDestroy();
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-        LogUtils.d(TAG, "onCompletion: Easyhood");
-        playNextVideo();
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        LogUtils.d(TAG, "onPrepared: Easyhood");
-        mediaPlayer.start();
     }
 
     @Override
@@ -175,7 +150,7 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void onBackPressed() {
-       // super.onBackPressed();
+        // super.onBackPressed();
     }
 
     /**
@@ -183,56 +158,20 @@ public class EndDisplayActivity extends AppCompatActivity implements MediaPlayer
      */
     private void startPlay() {
         LogUtils.d(TAG, "startPlay: Easyhood");
-        svEndBg.getHolder().addCallback(new SurfaceHolder.Callback() {
+        //加载视频资源
+        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
+        videoEndBg.setVideoURI(uri);
+        videoEndBg.start();
+        //设置监听
+        videoEndBg.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
-            public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceCreated: Easyhood");
-                //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
-                try {
-//
-                    Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
-                    mediaPlayer.setDataSource(getApplicationContext(), uri);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.prepareAsync();
-                    mediaPlayer.setDisplay(svEndBg.getHolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                LogUtils.d(TAG, "surfaceChanged: Easyhood");
-            }
-
-            @Override
-            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceDestroyed: Easyhood");
+            public void onPrepared(MediaPlayer mp) {
+                //回调成功并播放视频
+                Log.d(TAG, "setOnPreparedListener");
+                mp.start();
+                mp.setLooping(true);
             }
         });
-    }
-
-    /**
-     * 播放下一个视频
-     */
-    private void playNextVideo() {
-        if (currentVideoIndex < playlist.size() - 1) {
-            currentVideoIndex++;
-        } else {
-            currentVideoIndex = 0; // 如果已经是列表中的最后一个视频，回到列表开头
-        }
-
-        Uri nextVideoUri = playlist.get(currentVideoIndex);
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(getApplicationContext(), nextVideoUri);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDisplay(svEndBg.getHolder()); // surfaceHolder 是用于显示视频的SurfaceHolder对象
-            mediaPlayer.prepareAsync();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

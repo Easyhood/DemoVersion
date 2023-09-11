@@ -1,24 +1,20 @@
 package com.mssm.demoversion.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.VideoView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
@@ -35,9 +31,7 @@ import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.TimerTextView;
-import com.tencent.bugly.crashreport.CrashReport;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +42,13 @@ import java.util.Map;
  * @desciption 扫码互动界面
  * @since 2023/7/14
  **/
-public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener,
- MediaPlayer.OnPreparedListener, View.OnClickListener, TimerComputedListener {
+public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClickListener,
+        TimerComputedListener {
 
     private static final String TAG = "ScanQRCodeActivity";
 
     // 播放视频预览界面
-    private SurfaceView surfaceVideo;
+    private VideoView videoView;
 
     private RelativeLayout rlScanQRCode;
 
@@ -66,9 +60,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     // 倒计时
     private TimerTextView tvTimer;
-
-    // meidiaplayer对象
-    private MediaPlayer mediaPlayer;
 
     private MsMqttService msMqttService;
 
@@ -120,8 +111,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
      */
     private void initView() {
         // 播放视频预览界面
-        surfaceVideo = findViewById(R.id.surface_video);
-        rlScanQRCode= findViewById(R.id.rl_scanqrcode);
+        videoView = findViewById(R.id.video_view);
+        rlScanQRCode = findViewById(R.id.rl_scanqrcode);
         ivQrCodeBg = findViewById(R.id.iv_qrcodebg);
         ivQrCode = findViewById(R.id.iv_qrcode);
         tvTimer = findViewById(R.id.tv_timer);
@@ -133,22 +124,20 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
         String typeEvent = mqttModel.getBgLayerModel().getBgResType();
         if (Constant.VIDEO_TYPE.equals(typeEvent)) {
             ivQrCodeBg.setVisibility(View.INVISIBLE);
-            surfaceVideo.setVisibility(View.VISIBLE);
-            surfaceVideo.setOnClickListener(this::onClick);
-            // meidiaplayer对象
-            mediaPlayer = new MediaPlayer();
+            videoView.setVisibility(View.VISIBLE);
+            videoView.setOnClickListener(this::onClick);
             currentVideoIndex = 0;
-            // 设置准备监听
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.setOnCompletionListener(this);
             startPlay();
         } else {
-            surfaceVideo.setVisibility(View.INVISIBLE);
+            videoView.setVisibility(View.INVISIBLE);
             ivQrCodeBg.setVisibility(View.VISIBLE);
             setIvQrCodeBg();
         }
-
         initQRCode();
+        ivQrCode.setVisibility(View.VISIBLE);
+        tvTimer.setVisibility(View.VISIBLE);
+        tvTimer.setTimes(playTimeL);
+        tvTimer.beginRun();
     }
 
     /**
@@ -258,87 +247,24 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     }
 
     /**
-     * 开始播放回调
-     *
-     * @param mp the MediaPlayer that is ready for playback
-     */
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        LogUtils.d(TAG, "onPrepared: Easyhood");
-        mediaPlayer.start();
-        ivQrCode.setVisibility(View.VISIBLE);
-        tvTimer.setVisibility(View.VISIBLE);
-        tvTimer.setTimes(playTimeL);
-        tvTimer.beginRun();
-
-    }
-
-    /**
-     * 结束播放回调
-     *
-     * @param mp the MediaPlayer that reached the end of the file
-     */
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        LogUtils.d(TAG, "onCompletion: Easyhood");
-        // playNextVideo();
-    }
-
-    /**
      * 开始播放视频
      */
     private void startPlay() {
         LogUtils.d(TAG, "startPlay: Easyhood");
-        surfaceVideo.getHolder().addCallback(new SurfaceHolder.Callback() {
+        //加载视频资源
+        Uri uri = getBoxUri();
+        videoView.setVideoURI(uri);
+        videoView.start();
+        //设置监听
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
-            public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceCreated: Easyhood");
-                //String filePath = new File(getExternalFilesDir(""), "mssm_1.mp4").getAbsolutePath();
-                try {
-                    Uri uri = getBoxUri();
-                    mediaPlayer.setDataSource(getApplicationContext(), uri);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.prepareAsync();
-                    mediaPlayer.setDisplay(surfaceVideo.getHolder());
-                    mediaPlayer.setLooping(true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                LogUtils.d(TAG, "surfaceChanged: Easyhood");
-            }
-
-            @Override
-            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceDestroyed: Easyhood");
+            public void onPrepared(MediaPlayer mp) {
+                //回调成功并播放视频
+                Log.d(TAG, "setOnPreparedListener");
+                mp.start();
+                mp.setLooping(true);
             }
         });
-    }
-
-    /**
-     * 播放下一个视频
-     */
-    private void playNextVideo() {
-        if (currentVideoIndex < playlist.size() - 1) {
-            currentVideoIndex++;
-        } else {
-            currentVideoIndex = 0; // 如果已经是列表中的最后一个视频，回到列表开头
-        }
-
-        Uri nextVideoUri = playlist.get(currentVideoIndex);
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(getApplicationContext(), nextVideoUri);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDisplay(surfaceVideo.getHolder()); // surfaceHolder 是用于显示视频的SurfaceHolder对象
-            mediaPlayer.prepareAsync();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -350,17 +276,17 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
     @Override
     protected void onDestroy() {
         tvTimer.stopRun();
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if (videoView != null && videoView.isPlaying()) {
+            videoView.pause();
+            videoView.stopPlayback();
+            videoView.suspend();
         }
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-       // super.onBackPressed();
+        // super.onBackPressed();
     }
 
     @Override
@@ -387,6 +313,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements MediaPlayer
 
     /**
      * 获取宝箱视频Uri
+     *
      * @return boxUri
      */
     private Uri getBoxUri() {

@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".activity.ScanQRCodeActivity"
     android:id="@+id/rl_scanqrcode">
-    <SurfaceView
-        android:id="@+id/surface_video"
+    <VideoView
+        android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <ImageView

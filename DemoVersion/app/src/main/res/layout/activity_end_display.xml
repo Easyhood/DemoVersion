@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".activity.EndDisplayActivity"
     android:id="@+id/rl_end_display">
-    <SurfaceView
-        android:id="@+id/sv_end_bg"
+    <VideoView
+        android:id="@+id/video_end_bg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
     <ImageView
         android:id="@+id/iv_end_bg"
         android:layout_width="match_parent"
