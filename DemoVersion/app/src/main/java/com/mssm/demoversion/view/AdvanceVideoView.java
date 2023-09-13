@@ -1,8 +1,10 @@
 package com.mssm.demoversion.view;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -23,6 +25,8 @@ import xyz.doikki.videoplayer.player.VideoView;
  * @since 2023/7/11
  **/
 public class AdvanceVideoView extends RelativeLayout {
+
+    private static final String TAG = "AdvanceVideoView";
     public ImageView imageView;
     private VideoView videoView;
     private RelativeLayout videoRela;
@@ -130,5 +134,10 @@ public class AdvanceVideoView extends RelativeLayout {
         }
     }
 
+    public void setLooping() {
+        if (videoView != null) {
+            videoView.setLooping(true);
+        }
+    }
 
 }

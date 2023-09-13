@@ -73,6 +73,8 @@ public class Constant {
     public static final int INDEX_60 = 60;
     public static final int INDEX_1000 = 1000;
 
+    public static final int INDEX_10000 = 10000;
+
     // 宝箱值
     public static final int BOX_BLACK_VALUE = 0;
     public static final int BOX_BLUE_VALUE = 1;
