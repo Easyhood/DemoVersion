@@ -3,8 +3,6 @@ package com.mssm.demoversion.base;
 import android.app.Application;
 import android.content.Context;
 
-import com.liulishuo.filedownloader.FileDownloader;
-import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.Utils;
@@ -12,7 +10,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
 import me.jessyan.autosize.AutoSize;
-import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
+import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoViewConfig;
 import xyz.doikki.videoplayer.player.VideoViewManager;
 
@@ -47,7 +45,6 @@ public class BaseApplication extends Application {
 
         AutoSize.initCompatMultiProcess(this);
         initVideoPlay();
-        initFileDownload();
         MsCrashHandler.getInstance().init(getInstances().getApplicationContext());
         initBuglySetting();
         Utils.setHomeLauncher();
@@ -71,21 +68,10 @@ public class BaseApplication extends Application {
     private void initVideoPlay() {
         VideoViewManager.setConfig(VideoViewConfig.newBuilder()
                 // 使用使用IjkPlayer解码
-                .setPlayerFactory(IjkPlayerFactory.create())
-                .setLogEnabled(true)
+                // .setPlayerFactory(IjkPlayerFactory.create())
+                .setPlayerFactory(AndroidMediaPlayerFactory.create())
+                .setLogEnabled(false)
                 .build());
-    }
-
-
-
-    private void initFileDownload() {
-        FileDownloader.setupOnApplicationOnCreate(getInstances())
-                .connectionCreator(new FileDownloadUrlConnection
-                        .Creator(new FileDownloadUrlConnection.Configuration()
-                        .connectTimeout(15_000) // set connection timeout.
-                        .readTimeout(15_000) // set read timeout.
-                ))
-                .commit();
     }
 
 }

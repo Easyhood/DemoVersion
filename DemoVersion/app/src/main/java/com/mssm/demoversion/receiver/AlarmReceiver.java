@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.FileUtils;
@@ -24,7 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 public void run() {
                     FileUtils.removeFileByTime(LogUtils.LOG_PATH);
                     FileUtils.removeFileByTime(MsCrashHandler.CRASH_PATH);
-                    FileUtils.removeFileByTime(MultiDownload.DOWNLOAD_PATH);
+                    FileUtils.removeFileByTime(Constant.DOWNLOAD_PATH);
                 }
             }).start();
         }

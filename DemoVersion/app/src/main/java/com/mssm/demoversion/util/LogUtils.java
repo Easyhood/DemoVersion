@@ -16,7 +16,7 @@ import java.util.Date;
 public class LogUtils {
     private final static Boolean ENABLE = true;
     private final static Boolean NEED_SAVE = true;
-    public final static String LOG_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSM_Android_Log";
+    public final static String LOG_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSM_Android_Log/";
 
     public static void d(String tag, String info) {
         if (ENABLE) {

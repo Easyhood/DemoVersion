@@ -1,5 +1,7 @@
 package com.mssm.demoversion.util;
 
+import android.os.Environment;
+
 /**
  * @author Easyhood
  * @desciption 命名、链接、地址等工具类
@@ -57,6 +59,11 @@ public class Constant {
     // 扫码播放停止标识
     public static final String END_RT_EVENT = "END_RT_EVENT";
 
+    /**
+     * DOWNLOAD_PATH 下载地址
+     */
+    public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMDownload";
+
     // 数字索引
     public static final int INDEX_0 = 0;
     public static final int INDEX_1 = 1;
@@ -70,6 +77,8 @@ public class Constant {
     public static final int INDEX_20 = 20;
     public static final int INDEX_23 = 23;
     public static final int INDEX_24 = 24;
+
+    public static final int INDEX_25 = 25;
     public static final int INDEX_60 = 60;
     public static final int INDEX_1000 = 1000;
 

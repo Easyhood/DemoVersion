@@ -21,8 +21,7 @@
         android:layout_width="71dp"
         android:layout_height="71dp"
         android:layout_marginTop="57dp"
-        android:layout_marginLeft="198.6dp"
-        android:src="@drawable/msqr_pg_ex"/>
+        android:layout_marginLeft="198.6dp" />
     <com.mssm.demoversion.view.TimerTextView
         android:id="@+id/tv_timer"
         android:layout_width="wrap_content"

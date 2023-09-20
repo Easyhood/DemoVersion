@@ -3,7 +3,6 @@ package com.mssm.demoversion.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -71,12 +70,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
     private int currentVideoIndex;
 
     private long playTimeL;
-
-    // 本地背景图片
-    private String localtopBgPath;
-
-    // 本地二维码图片
-    private String localtopFloatPath;
 
     private Bitmap qrBitmap;
 
@@ -151,8 +144,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
             return;
         }
         String mqttModelStr = intent.getStringExtra("bean");
-        localtopBgPath = intent.getStringExtra("localtopBgPath");
-        localtopFloatPath = intent.getStringExtra("localtopFloatPath");
         LogUtils.d(TAG, "init: mqttModelStr = " + mqttModelStr);
         if (mqttModelStr == null) {
             return;
@@ -169,20 +160,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
             finish();
             return;
         }
-    }
-
-    /**
-     * 初始化背景图片
-     */
-    private void initTopBgImage() {
-        rlScanQRCode.removeView(ivQrCodeBg);
-        Bitmap topBgBitmap = BitmapFactory.decodeFile(localtopBgPath);
-        ivQrCodeBg.setImageBitmap(topBgBitmap);
-        ivQrCodeBg.setImageAlpha(100);
-        RelativeLayout.LayoutParams params = new RelativeLayout.
-                LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
-        rlScanQRCode.addView(ivQrCodeBg);
     }
 
     /**
@@ -213,32 +190,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
         }
         qrBitmap = Bitmap.createBitmap(colors, qrWidth, qrHeight, Bitmap.Config.RGB_565);
         ivQrCode.setImageBitmap(qrBitmap);
-    }
-
-    /**
-     * 初始化二维码图片
-     */
-    private void initScanQRCodeImage() {
-        rlScanQRCode.removeView(ivQrCode);
-        Bitmap topFloatBitmap = BitmapFactory.decodeFile(localtopFloatPath);
-        if (mqttModel == null) {
-            LogUtils.d(TAG, "initScanQRCodeImage: mqttModel is null");
-            return;
-        }
-        int display_width = mqttModel.getTopLayerModel().getTopFloatImgModel().
-                getDisplayWidth();
-        int display_height = mqttModel.getTopLayerModel().getTopFloatImgModel().
-                getDisplayHeight();
-        int display_offset_x = mqttModel.getTopLayerModel().getTopFloatImgModel().
-                getDisplayOffsetX();
-        int display_offset_y = mqttModel.getTopLayerModel().getTopFloatImgModel().
-                getDisplayOffsetY();
-        RelativeLayout.LayoutParams params = new RelativeLayout.
-                LayoutParams(display_width, display_height);
-        params.leftMargin = display_offset_x;
-        params.topMargin = display_offset_y;
-        ivQrCode.setImageBitmap(topFloatBitmap);
-        rlScanQRCode.addView(ivQrCode);
     }
 
     @Override

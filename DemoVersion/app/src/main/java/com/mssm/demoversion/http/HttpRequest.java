@@ -3,12 +3,12 @@ package com.mssm.demoversion.http;
 import android.content.Context;
 import android.util.Log;
 
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloader;
 import com.mssm.demoversion.base.BaseApplication;
-import com.mssm.demoversion.download.MultiDownload;
+import com.mssm.demoversion.download.MultiFileDownloadManager;
 import com.mssm.demoversion.model.AdvertiseModel;
+import com.mssm.demoversion.model.BaseFileDownloadModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
+import com.mssm.demoversion.presenter.MultiFileDownloadListener;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
@@ -16,7 +16,7 @@ import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.Advance;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +35,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HttpRequest {
     private static final String TAG = "HttpRequest";
 
-    private MultiDownload mMultiDownload;
+    private MultiFileDownloadManager mDownloadManager;
 
-    private List<BaseDownloadTask> mTask;
+    private List<BaseFileDownloadModel> mFileDownloadTask;
 
     private List<Advance> mData;
 
@@ -45,7 +45,7 @@ public class HttpRequest {
 
     public HttpRequest() {
         mContext = BaseApplication.getInstances().getApplicationContext();
-        mMultiDownload = new MultiDownload();
+        mDownloadManager = new MultiFileDownloadManager();
     }
     /**
      * 请求广告播放计划
@@ -87,7 +87,7 @@ public class HttpRequest {
                 }
                 if (!planId.equals(spPlanId)){
                     LogUtils.d(TAG, "onResponse: startMultiDownload ");
-                    startMultiDownload(model);
+                    startFileDownload(model);
                     SharedPreferencesUtils.putString(mContext, Constant.AD_UUID_KEY, planId);
                 } else {
                     LogUtils.d(TAG, "onResponse: Not download Cause planId is same as spPlanId : "
@@ -103,62 +103,80 @@ public class HttpRequest {
     }
 
     /**
-     * 开始多任务下载
-     * @param model 广告实体对象
+     * 开始下载文件
+     * @param model AdvertiseModel
      */
-    public void startMultiDownload(AdvertiseModel model) {
-        mTask = new ArrayList<>();
-        mData = new ArrayList<>();
-        mTask.clear();
-        mData.clear();
+    public void startFileDownload(AdvertiseModel model) {
+        mFileDownloadTask = new ArrayList<>();
+        mFileDownloadTask.clear();
         for (int i = 0; i < model.getData().size(); i++) {
             for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
-                String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
                 String filePath = model.getData().get(i).getAdMaterials().get(j).getAdFilePath();
-                int playTime = model.getData().get(i).getAdMaterials().get(j).getPlayTime();
-                int filePlayTime = playTime * 1000;
-                analyzeFileParam(fileType, filePath, filePlayTime);
+                StringBuffer sb = new StringBuffer();
+                String downloadUrl = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
+                String saveFilePath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
+                String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
+                String md5Str = model.getData().get(i).getAdMaterials().get(j).getFileMD5();
+                int playTime = model.getData().get(i).getAdMaterials().get(j).getPlayTime() * 1000;
+                BaseFileDownloadModel downloadModel = new BaseFileDownloadModel();
+                downloadModel.setDownloadUrl(downloadUrl);
+                downloadModel.setSaveFilePath(saveFilePath);
+                downloadModel.setFileType(fileType);
+                downloadModel.setMd5Str(md5Str);
+                downloadModel.setFilePlayTime(playTime);
+                downloadModel.setListener(this.adListener);
+                if (!mFileDownloadTask.contains(downloadModel)) {
+                    mFileDownloadTask.add(downloadModel);
+                }
             }
         }
-        if (mTask.size() > Constant.INDEX_0) {
-            mMultiDownload.start_multi(mTask, Constant.ADVERTISE_DOWNLOAD);
-        } else {
-            CallBackUtils.doCallBackMethod(Constant.ADVERTISE_DOWNLOAD);
-        }
-
+        mDownloadManager.startMultiFileDownload(mFileDownloadTask);
     }
-
 
     /**
-     * 处理文件参数
-     * @param fileType 文件类型
-     * @param filePath 文件路径
+     * 创建一个MultiFileDownloadListener对象，实现回调方法
      */
-    public void analyzeFileParam(String fileType, String filePath, int filePlayTime) {
-        LogUtils.d(TAG, "analyzeFileParam: fileType = " + fileType + " , filePlayTime = "
-                        + filePlayTime + " , filePath = " + filePath);
-        StringBuffer sb = new StringBuffer();
-        String httpUrlPath = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
-        BaseDownloadTask task = FileDownloader.getImpl().create(httpUrlPath)
-                .setPath(MultiDownload.DOWNLOAD_PATH, true);
-        String localPath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
-        LogUtils.d(TAG, "analyzeFileParam: localPath = " + localPath);
-        File checkFile = new File(localPath);
-        LogUtils.d(TAG, "analyzeFileParam: checkFile Exists = " + checkFile.exists());
-        if (!checkFile.exists()) {
-            mTask.add(task);
+    MultiFileDownloadListener adListener = new MultiFileDownloadListener() {
+        @Override
+        public void onSuccess(String url, String filePath) {
+            // 下载成功时，打印文件的URL和保存路径
+            LogUtils.d(TAG, "onSuccess: Downloaded : " + url + " to " + filePath);
         }
-        if (Constant.IMAGE_TYPE.equals(fileType)) {
-            Advance imageAdvance = new Advance(localPath, Constant.IMAGE_INDEX, filePlayTime);
-            mData.add(imageAdvance);
-        } else if (Constant.VIDEO_TYPE.equals(fileType)) {
-            Advance videoAdvance = new Advance(localPath, Constant.VIDEO_INDEX, filePlayTime);
-            mData.add(videoAdvance);
-        } else {
-            LogUtils.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
+
+        @Override
+        public void onFailure(String url, IOException e) {
+            // 下载失败时，打印文件的URL和异常信息
+            LogUtils.d(TAG, "onFailure: Failed to download : " + url + ": " + e.getMessage());
         }
-    }
-    public List<Advance> getData () {
-        return mData;
-    }
+
+        @Override
+        public void onProgress(String url, int progress) {
+            // 下载过程中，打印文件的URL和进度百分比
+            LogUtils.d(TAG, "onProgress: Downloading : " + Utils.getFileName(url) + ": " + progress + "%");
+        }
+
+        @Override
+        public void onAllDownloadFinished(ArrayList<BaseFileDownloadModel> successList) {
+            // 全部文件下载结束后，打印成功列表的大小和内容
+            LogUtils.d(TAG, "onAllDownloadFinished: All download finished, success list size: " + successList.size());
+            mData = new ArrayList<>();
+            mData.clear();
+            for (int i=0; i < successList.size(); i++) {
+                LogUtils.d(TAG, "onAllDownloadFinished: downloadModel is " + successList.get(i).toString());
+                String savePath = successList.get(i).getSaveFilePath();
+                String fileType = successList.get(i).getFileType();
+                int playTime = successList.get(i).getFilePlayTime();
+                if (Constant.IMAGE_TYPE.equals(fileType)) {
+                    Advance imageAdvance = new Advance(savePath, Constant.IMAGE_INDEX, playTime);
+                    mData.add(imageAdvance);
+                } else if (Constant.VIDEO_TYPE.equals(fileType)) {
+                    Advance videoAdvance = new Advance(savePath, Constant.VIDEO_INDEX, playTime);
+                    mData.add(videoAdvance);
+                } else {
+                    LogUtils.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
+                }
+            }
+            CallBackUtils.doAdDownloadFinishedListener(mData);
+        }
+    };
 }

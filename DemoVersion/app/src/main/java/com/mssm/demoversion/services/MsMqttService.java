@@ -17,16 +17,11 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.google.gson.Gson;
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloader;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.activity.EndDisplayActivity;
 import com.mssm.demoversion.activity.ScanQRCodeActivity;
-import com.mssm.demoversion.download.MultiDownload;
 import com.mssm.demoversion.model.MqttModel;
-import com.mssm.demoversion.presenter.DownloadCompletedListener;
-import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
@@ -39,7 +34,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * @desciption MQTT服务进程
  * @since 2023/7/14
  **/
-public class MsMqttService extends Service implements DownloadCompletedListener {
+public class MsMqttService extends Service {
 
     private static final String TAG = "MsMqttService";
     private static final int NOTIFICATION_ID = 1001;
@@ -60,12 +54,8 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     private Handler mHandler;
     private MqttClient client;
     private MqttConnectOptions options;
-    private MultiDownload mMultiDownload;
     private ScheduledExecutorService scheduler;
     private String messageJson;
-    private List<BaseDownloadTask> mTask;
-    private String localtopBgPath;
-    private String localtopFloatPath;
 
     private boolean isReceived = false;
 
@@ -121,7 +111,8 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
                 setMqttModel(mqttModel);
                 LogUtils.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
                 if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
-                    startResMultiDownload(mqttModel);
+                    // startResMultiDownload(mqttModel);
+                    startToScanQRCode(getApplicationContext());
                 } else if (Constant.END_RT_EVENT.equals(mqttModel.getCmdStr())) {
                     LogUtils.d(TAG, "messageArrived: getDisplayTime = " + mqttModel.getDisplayTime());
                     if (mqttModel.getDisplayTime() != Constant.INDEX_0) {
@@ -150,7 +141,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
     @Override
     public void onCreate() {
         super.onCreate();
-        CallBackUtils.setListener(this);
         mHandler = new Handler();
         // 8.0 以上需要特殊处理
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -167,7 +157,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
                 .build();
         // make the service foreground
         startForeground(NOTIFICATION_ID, notification);
-        mMultiDownload = new MultiDownload();
         mqttInit();
     }
 
@@ -311,15 +300,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         return null;
     }
 
-    @Override
-    public void completedCallback(int tag) {
-        Log.d(TAG, "completedCallback: tag = " + tag);
-        if (Constant.SCANQRCODE_DOWNLOAD == tag) {
-            Log.d(TAG, "completedCallback: " + getString(R.string.mqtt_scancode_download));
-            startToScanQRCode(getApplicationContext());
-        }
-    }
-
     /**
      * 跳转到二维码扫描互动界面
      *
@@ -329,8 +309,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
         Intent intent = new Intent(context, ScanQRCodeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("bean", messageJson);
-        intent.putExtra("localtopBgPath", localtopBgPath);
-        intent.putExtra("localtopFloatPath", localtopFloatPath);
         startActivity(intent);
     }
 
@@ -359,28 +337,6 @@ public class MsMqttService extends Service implements DownloadCompletedListener 
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(activityIntent);
         }
-    }
-
-    /**
-     * 开始多任务下载
-     *
-     * @param model 广告实体对象
-     */
-    private void startResMultiDownload(MqttModel model) {
-        Log.d(TAG, "startResMultiDownload");
-        mTask = new ArrayList<>();
-        mTask.clear();
-        String topBgHttpUrlPath = model.getTopLayerModel().getTopBgImageModel().getResUrl();
-        localtopBgPath = Utils.checkDownloadFilePath(Utils.getFileName(topBgHttpUrlPath));
-        BaseDownloadTask topBgHttpUrlTask = FileDownloader.getImpl().create(topBgHttpUrlPath)
-                .setPath(MultiDownload.DOWNLOAD_PATH, true);
-        mTask.add(topBgHttpUrlTask);
-        String topFloatHttpUrlPath = model.getTopLayerModel().getTopFloatImgModel().getResUrl();
-        localtopFloatPath = Utils.checkDownloadFilePath(Utils.getFileName(topFloatHttpUrlPath));
-        BaseDownloadTask topFloatHttpUrlTask = FileDownloader.getImpl().create(topFloatHttpUrlPath)
-                .setPath(MultiDownload.DOWNLOAD_PATH, true);
-        mTask.add(topFloatHttpUrlTask);
-        mMultiDownload.start_multi(mTask, Constant.SCANQRCODE_DOWNLOAD);
     }
 
     private void protectMqttReceiver() {

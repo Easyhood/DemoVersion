@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,6 +14,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,7 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.jaeger.library.StatusBarUtil;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.http.HttpRequest;
-import com.mssm.demoversion.presenter.DownloadCompletedListener;
+import com.mssm.demoversion.presenter.AdDownloadFinishedListener;
 import com.mssm.demoversion.services.DaemonService;
 import com.mssm.demoversion.services.MsMqttService;
 import com.mssm.demoversion.util.CallBackUtils;
@@ -47,7 +47,7 @@ import java.util.List;
  * @desciption 轮播广告播放界面
  * @since 2023/7/10
  **/
-public class AdvertisePlayActivity extends AppCompatActivity implements DownloadCompletedListener {
+public class AdvertisePlayActivity extends AppCompatActivity implements AdDownloadFinishedListener {
 
     private static final String TAG = "AdvertisePlayActivity";
 
@@ -78,7 +78,6 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            initDownloadData();
                         }
                     });
 
@@ -93,7 +92,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advertise_play);
-        CallBackUtils.setListener(this);
+        CallBackUtils.setAdDownloadFinishedListener(this);
         mContext = getApplicationContext();
         isFirstOpen = true;
         httpRequest = new HttpRequest();
@@ -132,15 +131,9 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
      */
     private void initDefaultData() {
         data.clear();
-        addAdvancePhotoData("mspg_1.jpg", R.raw.mspg_1, mContext);
-        addAdvancePhotoData("mspg_2.jpg", R.raw.mspg_2, mContext);
         addAdvancePhotoData("mspg_3.jpg", R.raw.mspg_3, mContext);
         addAdvancePhotoData("mspg_4.jpg", R.raw.mspg_4, mContext);
-        addAdvancePhotoData("mspg_5.jpg", R.raw.mspg_5, mContext);
-        addAdvancePhotoData("mspg_6.jpg", R.raw.mspg_6, mContext);
         addAdvanceVideoData("mssm_1.mp4", R.raw.mssm_1, mContext);
-        addAdvanceVideoData("mssm_2.mp4", R.raw.mssm_2, mContext);
-        addAdvanceVideoData("mssm_3.mp4", R.raw.mssm_3, mContext);
         mViewPager.setData(data);
     }
 
@@ -165,11 +158,17 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
 
     /**
      * 初始化下载数据
+     *
+     * @param advancesData 广告下载素材计划
      */
-    public void initDownloadData() {
+    public void initDownloadData(List<Advance> advancesData) {
+        if (advancesData == null || advancesData.size() == Constant.INDEX_0) {
+            LogUtils.d(TAG, "initDownloadData: advancesData is null");
+            return;
+        }
         LogUtils.d(TAG, "initDownloadData");
         data.clear();
-        data = httpRequest.getData();
+        data = advancesData;
         mViewPager.setData(data);
     }
 
@@ -246,16 +245,6 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         sendBroadcast(intent);
     }
 
-    @Override
-    public void completedCallback(int tag) {
-        LogUtils.d(TAG, "completedCallback MultiDownload tag = " + tag);
-        if (Constant.ADVERTISE_DOWNLOAD == tag) {
-            Message message = new Message();
-            message.what = Constant.DOWNLOAD_COMPLETED;
-            mHandler.sendMessageDelayed(message, Constant.DELAY_TIMES);
-        }
-    }
-
     /**
      * 定期删除过期文件
      */
@@ -277,7 +266,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
         //获得当前系统已经启动的时间
         mHints[mHints.length - 1] = SystemClock.uptimeMillis();
-        if(SystemClock.uptimeMillis()-mHints[0]<= 5000) {
+        if (SystemClock.uptimeMillis() - mHints[0] <= 5000) {
             DialogSeven();
         }
     }
@@ -309,7 +298,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String enter = editText.getText().toString();
-                        if (Constant.EXIT_PASSWORD.equals(enter)){
+                        if (Constant.EXIT_PASSWORD.equals(enter)) {
                             startToSystemLauncher();
                         }
                     }
@@ -320,5 +309,16 @@ public class AdvertisePlayActivity extends AppCompatActivity implements Download
         params.height = Constant.INDEX_20;
         dialog.getWindow().setAttributes(params);
         dialog.show();
+    }
+
+    @Override
+    public void onAdDownloadFinished(List<Advance> successAdvanceList) {
+        LogUtils.d(TAG, "onAdDownloadFinished");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                initDownloadData(successAdvanceList);
+            }
+        });
     }
 }

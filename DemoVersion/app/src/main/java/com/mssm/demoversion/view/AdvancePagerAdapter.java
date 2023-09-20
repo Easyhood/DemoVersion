@@ -62,7 +62,8 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
             if (advances.get(i).type.equals("1")) {
                 mPreloadManager.addPreloadTask(advances.get(i).path, i);
             }
-            if ((int) advances.get(i).playTime < Constant.INDEX_10000) {
+            if ((int) advances.get(i).playTime < Constant.INDEX_10000 &&
+                    (int) advances.get(i).playTime > time) {
                 time = (int) advances.get(i).playTime;
                 LogUtils.d(TAG, "setData: time = " + time);
             }

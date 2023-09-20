@@ -278,10 +278,10 @@ public class Utils {
      * @return serialNumber
      */
     public static String getCapitalDeviceSnNumber() {
-        String serialNumberStr = "1E3D79E9E60F3625";
-        yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
-        serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
-        Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
+        String serialNumberStr = "EB06857510D27BD6";
+        // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+        // serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
+        // Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
         return serialNumberStr;
     }
 
