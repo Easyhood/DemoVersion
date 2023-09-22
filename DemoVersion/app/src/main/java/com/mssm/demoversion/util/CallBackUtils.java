@@ -1,6 +1,7 @@
 package com.mssm.demoversion.util;
 
 import com.mssm.demoversion.presenter.AdDownloadFinishedListener;
+import com.mssm.demoversion.presenter.ApkDownloadFinishedListener;
 import com.mssm.demoversion.presenter.TimerComputedListener;
 import com.mssm.demoversion.view.Advance;
 
@@ -16,6 +17,8 @@ public class CallBackUtils {
     private static TimerComputedListener timerComputedListener;
 
     private static AdDownloadFinishedListener adDownloadFinishedListener;
+
+    private static ApkDownloadFinishedListener apkDownloadFinishedListener;
 
     /**
      * 设置倒计时结束监听
@@ -47,5 +50,21 @@ public class CallBackUtils {
      */
     public static void doAdDownloadFinishedListener(List<Advance> successAdvanceList) {
         adDownloadFinishedListener.onAdDownloadFinished(successAdvanceList);
+    }
+
+    /**
+     * 设置apk下载结束监听
+     * @param listener ApkDownloadFinishedListener
+     */
+    public static void setApkDownloadFinishedListener(ApkDownloadFinishedListener listener) {
+        apkDownloadFinishedListener = listener;
+    }
+
+    /**
+     * Apk下载结束返回存放路径
+     * @param savePath 存放路径
+     */
+    public static void doApkDownloadFinishedListener(String savePath) {
+        apkDownloadFinishedListener.onApkDownloadFinished(savePath);
     }
 }

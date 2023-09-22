@@ -2,6 +2,7 @@ package com.mssm.demoversion.base;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
@@ -48,6 +49,7 @@ public class BaseApplication extends Application {
         MsCrashHandler.getInstance().init(getInstances().getApplicationContext());
         initBuglySetting();
         Utils.setHomeLauncher();
+        setAutoBootApp();
     }
 
     /**
@@ -72,6 +74,15 @@ public class BaseApplication extends Application {
                 .setPlayerFactory(AndroidMediaPlayerFactory.create())
                 .setLogEnabled(false)
                 .build());
+    }
+
+    /**
+     * 设置开机自启动
+     */
+    private void setAutoBootApp() {
+        Intent intent = new Intent("com.android.yf_set_auto_bootapp");
+        intent.putExtra("package","com.mssm.demoversion");
+        sendBroadcast(intent);
     }
 
 }

@@ -19,16 +19,22 @@ import androidx.annotation.RequiresApi;
 import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.activity.ScanQRCodeActivity;
+import com.mssm.demoversion.base.BaseApplication;
+import com.mssm.demoversion.http.HttpRequest;
+import com.mssm.demoversion.presenter.ApkDownloadFinishedListener;
+import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
+import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
+import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
 /**
  * @author Easyhood
  * @desciption 守护进程服务
  * @since 2023/7/14
  **/
-public class DaemonService extends Service{
+public class DaemonService extends Service implements ApkDownloadFinishedListener {
 
     private static final String TAG = "DaemonService";
 
@@ -37,6 +43,14 @@ public class DaemonService extends Service{
     private DestroyReceiver destroyReceiver;
 
     private Handler handler;
+
+    // 循环请求变量声明
+    private Handler cycleHandler;
+    private Runnable cycleRunnable;
+
+    private HttpRequest httpRequest;
+
+    private YF_RK356x_API_Manager yfManager;
 
     public DaemonService() {
     }
@@ -61,11 +75,15 @@ public class DaemonService extends Service{
         // create the receiver and the handler
         destroyReceiver = new DestroyReceiver();
         handler = new Handler();
+        cycleHandler = new Handler();
+        httpRequest = new HttpRequest();
+        yfManager = new YF_RK356x_API_Manager(BaseApplication.getContext());
+        CallBackUtils.setApkDownloadFinishedListener(this);
         // register the receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ACTION_DESTROYED);
         registerReceiver(destroyReceiver, filter);
-
+        startCycleRequestApk();
     }
 
 
@@ -87,6 +105,7 @@ public class DaemonService extends Service{
         // unregister the receiver and remove any pending tasks
         unregisterReceiver(destroyReceiver);
         handler.removeCallbacksAndMessages(null);
+        cycleHandler.removeCallbacks(cycleRunnable);
     }
 
     /**
@@ -107,6 +126,16 @@ public class DaemonService extends Service{
         return channelId;
     }
 
+    @Override
+    public void onApkDownloadFinished(String savePath) {
+        LogUtils.d(TAG, "onApkDownloadFinished: savePath = " + savePath);
+        if (savePath == null) {
+            LogUtils.d(TAG, "return : savePath is null");
+            return;
+        }
+        installApkPackage(savePath);
+    }
+
     /**
      * a custom receiver to handle broadcasts from the activity
      */
@@ -115,7 +144,7 @@ public class DaemonService extends Service{
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null && intent.getAction().equals(Constant.ACTION_DESTROYED)) {
-                // post a delayed task to start the activity after 30 seconds
+                // post a delayed task to start the activity after 60 seconds
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -142,5 +171,32 @@ public class DaemonService extends Service{
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(activityIntent);
         }
+    }
+
+    /**
+     * 开始循环请求apk线程
+     */
+    private void startCycleRequestApk() {
+        cycleRunnable = new Runnable() {
+            @Override
+            public void run() {
+                httpRequest.requestNewAdApk();
+                cycleHandler.postDelayed(cycleRunnable, Constant.DELAY_APK_MILLIS);
+            }
+        };
+        cycleHandler.post(cycleRunnable);
+    }
+
+    /**
+     * 安装app安装包
+     * @param apkPath apk存放路径
+     */
+    private void installApkPackage(String apkPath) {
+        LogUtils.d(TAG, "installApkPackage");
+        Intent intent = new Intent();
+        intent.setAction("com.android.yf_slient_install");
+        intent.putExtra("path",apkPath);
+        intent.putExtra("isboot",true);
+        sendBroadcast(intent);
     }
 }

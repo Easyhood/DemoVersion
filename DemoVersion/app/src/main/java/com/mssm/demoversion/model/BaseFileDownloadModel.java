@@ -1,5 +1,6 @@
 package com.mssm.demoversion.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.mssm.demoversion.presenter.MultiFileDownloadListener;
 
 /**
@@ -18,6 +19,15 @@ public class BaseFileDownloadModel {
     private String md5Str;
 
     private int filePlayTime;
+
+    // 应用名称
+    private String apkName;
+
+    // 版本名称
+    private String versionName;
+
+    // 版本号
+    private int versionCode;
 
     private MultiFileDownloadListener listener;
 
@@ -69,6 +79,30 @@ public class BaseFileDownloadModel {
         this.listener = listener;
     }
 
+    public String getApkName() {
+        return apkName;
+    }
+
+    public void setApkName(String apkName) {
+        this.apkName = apkName;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
+    }
+
+    public int getVersionCode() {
+        return versionCode;
+    }
+
+    public void setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
+    }
+
     @Override
     public String toString() {
         return "BaseFileDownloadModel{" +
@@ -77,6 +111,9 @@ public class BaseFileDownloadModel {
                 ", fileType='" + fileType + '\'' +
                 ", md5Str='" + md5Str + '\'' +
                 ", filePlayTime=" + filePlayTime +
+                ", apkName='" + apkName + '\'' +
+                ", versionName='" + versionName + '\'' +
+                ", versionCode=" + versionCode +
                 ", listener=" + listener +
                 '}';
     }

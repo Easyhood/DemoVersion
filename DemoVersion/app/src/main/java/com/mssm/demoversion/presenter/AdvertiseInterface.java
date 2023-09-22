@@ -1,6 +1,7 @@
 package com.mssm.demoversion.presenter;
 
 import com.mssm.demoversion.model.AdvertiseModel;
+import com.mssm.demoversion.model.OTAModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -21,9 +22,16 @@ public interface AdvertiseInterface {
 
     /**
      * 获取服务器广告轮播计划
-     * @return
+     * @return 广告轮播计划
      */
     @GET("/ad/api/equipment_ad/{sn_number}")
     public Call<AdvertiseModel> getAdvertisePlan(@Path("sn_number") String snNumberStr);
+
+    /**
+     * 获取服务器广告最新版本
+     * @return 广告最新版本
+     */
+    @GET("/ad/api/ota_equipment/{sn_number}")
+    public Call<OTAModel> getNewAdApk(@Path("sn_number") String snNumberStr);
 
 }

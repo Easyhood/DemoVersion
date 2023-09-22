@@ -53,6 +53,8 @@ public class Constant {
 
     public static final long DELAY_MILLIS = 60000L;
 
+    public static final long DELAY_APK_MILLIS = 3*60*60*1000L;
+
     // 扫码通知标识
     // 扫码播放标识
     public static final String DISPLAY_RT_EVENT = "DISPLAY_RT_EVENT";
@@ -64,6 +66,11 @@ public class Constant {
      */
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMDownload";
 
+    /**
+     * DOWNLOAD_PATH 下载地址
+     */
+    public static final String APK_DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getPath() + "/MSSMApkDownload";
+
     // 数字索引
     public static final int INDEX_0 = 0;
     public static final int INDEX_1 = 1;
@@ -71,6 +78,7 @@ public class Constant {
     public static final int INDEX_3 = 3;
     public static final int INDEX_4 = 4;
     public static final int INDEX_5 = 5;
+    public static final int INDEX_7 = 7;
     public static final int INDEX_8 = 8;
     public static final int INDEX_10 = 10;
     public static final int INDEX_14 = 14;

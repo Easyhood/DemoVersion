@@ -149,9 +149,7 @@ public class MultiFileDownloadManager {
                     progress = (int) (currentSize * 100 / totalSize);
                     downloadMap.get(downloadModel.getDownloadUrl()).currentSize = currentSize;
                     downloadMap.get(downloadModel.getDownloadUrl()).progress = progress;
-                    if ((progress % Constant.INDEX_10) == Constant.INDEX_0) {
-                        downloadModel.getListener().onProgress(downloadModel.getDownloadUrl(), progress);
-                    }
+                    downloadModel.getListener().onProgress(downloadModel.getDownloadUrl(), progress);
                     // 将缓冲区的内容写入输出流
                     fos.write(buffer, 0, len);
                 }

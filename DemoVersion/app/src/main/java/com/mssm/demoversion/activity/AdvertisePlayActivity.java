@@ -9,18 +9,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.os.SystemClock;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.jaeger.library.StatusBarUtil;
@@ -68,25 +64,6 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
 
     //  首次打开应用
     private boolean isFirstOpen;
-
-    public Handler mHandler = new Handler(Looper.myLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case Constant.DOWNLOAD_COMPLETED:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
-
-                    break;
-                default:
-                    LogUtils.d(TAG, "handleMessage default");
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,7 +216,6 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
         LogUtils.d(TAG, "onDestroy");
         mViewPager.setDestroy();
         PreloadManager.getInstance(this).removeAllPreloadTask();
-        mHandler.removeCallbacksAndMessages(null);
         cycleHandler.removeCallbacks(cycleRunnable);
         Intent intent = new Intent(Constant.ACTION_DESTROYED);
         sendBroadcast(intent);

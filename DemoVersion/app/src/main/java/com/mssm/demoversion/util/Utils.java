@@ -7,6 +7,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
@@ -211,9 +213,30 @@ public class Utils {
      */
     public static String checkDownloadFilePath(String sourcePath) {
         String path = null;
-        File downloadFile = new File(Environment.getExternalStorageDirectory() + "/MSSMDownload", sourcePath);
+        File downloadFile = new File(Constant.DOWNLOAD_PATH, sourcePath);
         boolean isFileExists = isDownloadFileExists(sourcePath);
         LogUtils.d(TAG, "checkDownloadFilePath: isFileExists = " + isFileExists);
+        if (!isFileExists) {
+            File parentDir = downloadFile.getParentFile();
+            if (!parentDir.exists()) {
+                parentDir.mkdir();
+            }
+        }
+        path = downloadFile.getAbsolutePath();
+        return path;
+    }
+
+    /**
+     * 检查APK下载文件路径
+     *
+     * @param sourcePath 文件名
+     * @return 文件路径
+     */
+    public static String checkApkDownloadPath(String sourcePath) {
+        String path = null;
+        File downloadFile = new File(Constant.APK_DOWNLOAD_PATH, sourcePath);
+        boolean isFileExists = isDownloadFileExists(sourcePath);
+        LogUtils.d(TAG, "checkApkDownloadPath: isFileExists = " + isFileExists);
         if (!isFileExists) {
             File parentDir = downloadFile.getParentFile();
             if (!parentDir.exists()) {
@@ -279,9 +302,9 @@ public class Utils {
      */
     public static String getCapitalDeviceSnNumber() {
         String serialNumberStr = "EB06857510D27BD6";
-        // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
-        // serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
-        // Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
+         yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+         serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
+         Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
         return serialNumberStr;
     }
 
@@ -298,8 +321,10 @@ public class Utils {
      * 设置默认桌面
      */
     public static void setHomeLauncher(){
-        yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
-        yfapiManager.systemShell("shell cmd package set-home-activity \"com.mssm.demoversion/com.mssm.demoversion.activity.AdvertisePlayActivity\" ");
+        Intent intent = new Intent("com.android.yf_set_defaultLauncher");
+        intent.putExtra("pkgname","com.mssm.demoversion");
+        intent.putExtra("classname","com.mssm.demoversion.activity.AdvertisePlayActivity");
+        BaseApplication.getContext().sendBroadcast(intent);
     }
 
     /**
@@ -342,6 +367,24 @@ public class Utils {
             LogUtils.d(TAG, "createSSLSocketFactory: Exception is " + e);
         }
         return ssfFactory;
+    }
+
+    /**
+     * 获取当前程序版本名(对消费者不可见的版本号)
+     * @return 版本号
+     */
+    public static int getAppVersionCode() {
+        int versioncode = 0;
+        try {
+            PackageManager pm = BaseApplication.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo("com.mssm.demoversion", 0);
+            long versionCodeL = pi.getLongVersionCode();
+            versioncode = new Long(versionCodeL).intValue();
+        } catch (Exception e) {
+            LogUtils.e(TAG, "Exception : " + e);
+        }
+        Log.d(TAG, "getAppVersionCode: versioncode = " + versioncode);
+        return versioncode;
     }
 
 }

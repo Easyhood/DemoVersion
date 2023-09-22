@@ -41,7 +41,7 @@ public class FileUtils {
                 Date start = dateFormat.parse(dateFormat.format(new Date(file.lastModified())));
                 long diff = end.getTime() - start.getTime();//这样得到的差值是微秒级别
                 long days = diff / (1000 * 60 * 60 * 24);
-                if(30 <= days){
+                if(Constant.INDEX_10 <= days){
                     deleteFile2(file);
                 }
 

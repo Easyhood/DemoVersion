@@ -7,15 +7,18 @@ import com.mssm.demoversion.base.BaseApplication;
 import com.mssm.demoversion.download.MultiFileDownloadManager;
 import com.mssm.demoversion.model.AdvertiseModel;
 import com.mssm.demoversion.model.BaseFileDownloadModel;
+import com.mssm.demoversion.model.OTAModel;
 import com.mssm.demoversion.presenter.AdvertiseInterface;
 import com.mssm.demoversion.presenter.MultiFileDownloadListener;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
+import com.mssm.demoversion.util.FileUtils;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
 import com.mssm.demoversion.view.Advance;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,8 @@ public class HttpRequest {
     private MultiFileDownloadManager mDownloadManager;
 
     private List<BaseFileDownloadModel> mFileDownloadTask;
+
+    private List<BaseFileDownloadModel> mApkDownloadTask;
 
     private List<Advance> mData;
 
@@ -70,7 +75,7 @@ public class HttpRequest {
             public void onResponse(Call<AdvertiseModel> call, Response<AdvertiseModel> response) {
                 // 通过response获取序列化后的数据, 因为之前已经添加了GsonConvert
                 if (response == null) {
-                    Log.d(TAG, "onResponse: response is null !");
+                    LogUtils.d(TAG, "onResponse: response is null !");
                     return;
                 }
                 AdvertiseModel model = response.body();
@@ -125,7 +130,7 @@ public class HttpRequest {
                 downloadModel.setMd5Str(md5Str);
                 downloadModel.setFilePlayTime(playTime);
                 downloadModel.setListener(this.adListener);
-                if (!mFileDownloadTask.contains(downloadModel)) {
+                if (!mFileDownloadTask.contains(downloadUrl)) {
                     mFileDownloadTask.add(downloadModel);
                 }
             }
@@ -140,25 +145,30 @@ public class HttpRequest {
         @Override
         public void onSuccess(String url, String filePath) {
             // 下载成功时，打印文件的URL和保存路径
-            LogUtils.d(TAG, "onSuccess: Downloaded : " + url + " to " + filePath);
+            LogUtils.d(TAG,
+                    "onSuccess: Downloaded : " + url + " to " + filePath);
         }
 
         @Override
         public void onFailure(String url, IOException e) {
             // 下载失败时，打印文件的URL和异常信息
-            LogUtils.d(TAG, "onFailure: Failed to download : " + url + ": " + e.getMessage());
+            LogUtils.d(TAG,
+                    "onFailure: Failed to download : " + url + ": " + e.getMessage());
         }
 
         @Override
         public void onProgress(String url, int progress) {
             // 下载过程中，打印文件的URL和进度百分比
-            LogUtils.d(TAG, "onProgress: Downloading : " + Utils.getFileName(url) + ": " + progress + "%");
+            LogUtils.d(TAG, "onProgress: Downloading : "
+                    + Utils.getFileName(url) + ": " + progress + "%");
         }
 
         @Override
         public void onAllDownloadFinished(ArrayList<BaseFileDownloadModel> successList) {
             // 全部文件下载结束后，打印成功列表的大小和内容
-            LogUtils.d(TAG, "onAllDownloadFinished: All download finished, success list size: " + successList.size());
+            LogUtils.d(TAG,
+                    "onAllDownloadFinished: All download finished, success list size: " +
+                            successList.size());
             mData = new ArrayList<>();
             mData.clear();
             for (int i=0; i < successList.size(); i++) {
@@ -179,4 +189,132 @@ public class HttpRequest {
             CallBackUtils.doAdDownloadFinishedListener(mData);
         }
     };
+
+    /**
+     * 请求最新apk最新版本
+     */
+    public void requestNewAdApk() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.sslSocketFactory(Utils.createSSLSocketFactory(), new Utils.TrustAllCerts());
+        builder.hostnameVerifier(new Utils.TrustAllHostnameVerifier());
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(builder.build())
+                .baseUrl(AdvertiseInterface.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build(); // 创建Retrofit实体类
+
+        // 创建接口实现类
+        AdvertiseInterface advertiseInterface = retrofit.create(AdvertiseInterface.class);
+        // 通过接口实现类返回call对象
+        Call<OTAModel> apkCall = advertiseInterface.getNewAdApk(Utils.getCapitalDeviceSnNumber());
+        apkCall.enqueue(new Callback<OTAModel>() {
+            @Override
+            public void onResponse(Call<OTAModel> call, Response<OTAModel> response) {
+                if (response == null) {
+                    Log.d(TAG, "requestNewAdApk onResponse: response is null");
+                    return;
+                }
+                OTAModel otaModel = response.body();
+                if (otaModel == null || otaModel.getData() == null) {
+                    LogUtils.d(TAG, "requestNewAdApk onResponse: otaModel.getData() is null");
+                    return;
+                }
+                LogUtils.d(TAG, "requestNewAdApk onResponse: otaModel = " + otaModel.toString());
+                String serviceApkName = otaModel.getData().getApkName();
+                int serviceApkCode = otaModel.getData().getVersionCode();
+                Log.d(TAG, "onResponse: serviceApkName = " +
+                        serviceApkName + "; serviceApkCode = " + serviceApkCode);
+                if (serviceApkName == null || serviceApkCode < Constant.INDEX_7) {
+                    LogUtils.d(TAG,
+                            "onResponse: stop ! cause serviceApkName is null or serviceApkVersion less than 5.0");
+                    return;
+                }
+                if (Utils.getAppVersionCode() != serviceApkCode) {
+                    startDownloadApk(otaModel);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<OTAModel> call, Throwable t) {
+                LogUtils.d(TAG, "requestNewAdApk onFailure: Error ! Cause by " + t);
+            }
+        });
+    }
+
+    /**
+     * 开始下载apk
+     * @param otaModel OTAModel
+     */
+    private void startDownloadApk(OTAModel otaModel) {
+        LogUtils.d(TAG, "startDownloadApk");
+        mApkDownloadTask = new ArrayList<>();
+        mApkDownloadTask.clear();
+        deleteDownloadApkPath();
+        BaseFileDownloadModel downloadModel = new BaseFileDownloadModel();
+        String filePath = otaModel.getData().getFilePath();
+        StringBuffer sb = new StringBuffer();
+        String downloadUrl = sb.append(AdvertiseInterface.BASE_URL).append(filePath).toString();
+        String saveFilePath = Utils.checkApkDownloadPath(Utils.getFileName(filePath));
+        downloadModel.setDownloadUrl(downloadUrl);
+        downloadModel.setSaveFilePath(saveFilePath);
+        downloadModel.setMd5Str(otaModel.getData().getMd5Str());
+        downloadModel.setApkName(otaModel.getData().getApkName());
+        downloadModel.setVersionName(otaModel.getData().getVersionName());
+        downloadModel.setVersionCode(otaModel.getData().getVersionCode());
+        downloadModel.setListener(this.apkListener);
+        mApkDownloadTask.add(downloadModel);
+        mDownloadManager.startMultiFileDownload(mApkDownloadTask);
+    }
+
+    /**
+     * 创建一个MultiFileDownloadListener对象，实现回调方法
+     */
+    MultiFileDownloadListener apkListener = new MultiFileDownloadListener() {
+        @Override
+        public void onSuccess(String url, String filePath) {
+            // 下载成功时，打印文件的URL和保存路径
+            LogUtils.d(TAG + "_apkListener", "onSuccess: Downloaded : " +
+                    url + " to " + filePath);
+        }
+
+        @Override
+        public void onFailure(String url, IOException e) {
+            // 下载失败时，打印文件的URL和异常信息
+            LogUtils.d(TAG + "_apkListener", "onFailure: Failed to download : " +
+                    url + ": " + e.getMessage());
+        }
+
+        @Override
+        public void onProgress(String url, int progress) {
+            // 下载过程中，打印文件的URL和进度百分比
+            LogUtils.d(TAG + "_apkListener", "onProgress: Downloading : " +
+                    Utils.getFileName(url) + ": " + progress + "%");
+        }
+
+        @Override
+        public void onAllDownloadFinished(ArrayList<BaseFileDownloadModel> successList) {
+            // 全部文件下载结束后，打印成功列表的大小和内容
+            LogUtils.d(TAG + "_apkListener",
+                    "onAllDownloadFinished: All download finished, success list size: " +
+                            successList.size());
+            if (successList.size() > Constant.INDEX_0) {
+                String savePath = successList.get(Constant.INDEX_0).getSaveFilePath();
+                CallBackUtils.doApkDownloadFinishedListener(savePath);
+            }
+        }
+    };
+
+    /**
+     * 下载前先删除上次下载的安装包
+     */
+    private void deleteDownloadApkPath() {
+        LogUtils.d(TAG, "deleteDownloadApkPath");
+        File file = new File(Constant.APK_DOWNLOAD_PATH);
+        if (file.exists()) {
+            FileUtils.deleteFile2(file);
+        } else {
+            LogUtils.d(TAG, "deleteDownloadApkPath: file is not exists");
+        }
+    }
 }
