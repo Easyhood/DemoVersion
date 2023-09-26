@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -206,7 +207,6 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
         super.onPause();
         LogUtils.d(TAG, "onPause");
         mViewPager.setPause();
-        finish();
     }
 
 
@@ -289,6 +289,10 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
 
     @Override
     public void onAdDownloadFinished(List<Advance> successAdvanceList) {
+        for (int i = 0; i < successAdvanceList.size(); i++) {
+            Log.d(TAG, "onAdDownloadFinished: successAdvanceList i = " + i + "; data = "
+                    + successAdvanceList.get(i).toString());
+        }
         LogUtils.d(TAG, "onAdDownloadFinished");
         runOnUiThread(new Runnable() {
             @Override

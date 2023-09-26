@@ -92,8 +92,8 @@ public class HttpRequest {
                 }
                 if (!planId.equals(spPlanId)){
                     LogUtils.d(TAG, "onResponse: startMultiDownload ");
-                    startFileDownload(model);
                     SharedPreferencesUtils.putString(mContext, Constant.AD_UUID_KEY, planId);
+                    startFileDownload(model);
                 } else {
                     LogUtils.d(TAG, "onResponse: Not download Cause planId is same as spPlanId : "
                             + planId);
@@ -113,6 +113,8 @@ public class HttpRequest {
      */
     public void startFileDownload(AdvertiseModel model) {
         mFileDownloadTask = new ArrayList<>();
+        mData = new ArrayList<>();
+        mData.clear();
         mFileDownloadTask.clear();
         for (int i = 0; i < model.getData().size(); i++) {
             for (int j = 0; j < model.getData().get(i).getAdMaterials().size(); j++) {
@@ -123,17 +125,33 @@ public class HttpRequest {
                 String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
                 String md5Str = model.getData().get(i).getAdMaterials().get(j).getFileMD5();
                 int playTime = model.getData().get(i).getAdMaterials().get(j).getPlayTime() * 1000;
-                BaseFileDownloadModel downloadModel = new BaseFileDownloadModel();
-                downloadModel.setDownloadUrl(downloadUrl);
-                downloadModel.setSaveFilePath(saveFilePath);
-                downloadModel.setFileType(fileType);
-                downloadModel.setMd5Str(md5Str);
-                downloadModel.setFilePlayTime(playTime);
-                downloadModel.setListener(this.adListener);
-                if (!mFileDownloadTask.contains(downloadUrl)) {
-                    mFileDownloadTask.add(downloadModel);
+                if (Utils.checkFileExistsAndMD5(md5Str, saveFilePath)) {
+                    if (Constant.IMAGE_TYPE.equals(fileType)) {
+                        Advance imageAdvance = new Advance(saveFilePath, Constant.IMAGE_INDEX, playTime);
+                        mData.add(imageAdvance);
+                    } else if (Constant.VIDEO_TYPE.equals(fileType)) {
+                        Advance videoAdvance = new Advance(saveFilePath, Constant.VIDEO_INDEX, playTime);
+                        mData.add(videoAdvance);
+                    } else {
+                        LogUtils.d(TAG, "startFileDownload: fileType is Error! fileType is " + fileType);
+                    }
+                } else {
+                    BaseFileDownloadModel downloadModel = new BaseFileDownloadModel();
+                    downloadModel.setDownloadUrl(downloadUrl);
+                    downloadModel.setSaveFilePath(saveFilePath);
+                    downloadModel.setFileType(fileType);
+                    downloadModel.setMd5Str(md5Str);
+                    downloadModel.setFilePlayTime(playTime);
+                    downloadModel.setListener(this.adListener);
+                    if (!mFileDownloadTask.contains(downloadUrl)) {
+                        mFileDownloadTask.add(downloadModel);
+                    }
                 }
             }
+        }
+        if (Constant.INDEX_1 > mFileDownloadTask.size() && Constant.INDEX_0 < mData.size()) {
+            LogUtils.d(TAG, "startFileDownload: mFileDownloadTask size is 0 !");
+            CallBackUtils.doAdDownloadFinishedListener(mData);
         }
         mDownloadManager.startMultiFileDownload(mFileDownloadTask);
     }
@@ -169,8 +187,6 @@ public class HttpRequest {
             LogUtils.d(TAG,
                     "onAllDownloadFinished: All download finished, success list size: " +
                             successList.size());
-            mData = new ArrayList<>();
-            mData.clear();
             for (int i=0; i < successList.size(); i++) {
                 LogUtils.d(TAG, "onAllDownloadFinished: downloadModel is " + successList.get(i).toString());
                 String savePath = successList.get(i).getSaveFilePath();
@@ -183,7 +199,7 @@ public class HttpRequest {
                     Advance videoAdvance = new Advance(savePath, Constant.VIDEO_INDEX, playTime);
                     mData.add(videoAdvance);
                 } else {
-                    LogUtils.d(TAG, "analyzeFileParam: fileType is Error! fileType is " + fileType);
+                    LogUtils.d(TAG, "onAllDownloadFinished: fileType is Error! fileType is " + fileType);
                 }
             }
             CallBackUtils.doAdDownloadFinishedListener(mData);
@@ -222,7 +238,8 @@ public class HttpRequest {
                 LogUtils.d(TAG, "requestNewAdApk onResponse: otaModel = " + otaModel.toString());
                 String serviceApkName = otaModel.getData().getApkName();
                 int serviceApkCode = otaModel.getData().getVersionCode();
-                Log.d(TAG, "onResponse: serviceApkName = " +
+                String md5Str = otaModel.getData().getMd5Str();
+                LogUtils.d(TAG, "onResponse: serviceApkName = " +
                         serviceApkName + "; serviceApkCode = " + serviceApkCode);
                 if (serviceApkName == null || serviceApkCode < Constant.INDEX_7) {
                     LogUtils.d(TAG,
@@ -230,9 +247,14 @@ public class HttpRequest {
                     return;
                 }
                 if (Utils.getAppVersionCode() != serviceApkCode) {
+                    if (md5Str == SharedPreferencesUtils.getString(BaseApplication.getContext(), Constant.OTA_UUID_KEY)) {
+                        LogUtils.d(TAG, "onResponse: OTA_UUID_KEY is same ! OTA_UUID_KEY = " + md5Str);
+                        return;
+                    }
+                    SharedPreferencesUtils.putString(BaseApplication.getContext(), Constant.OTA_UUID_KEY, md5Str);
+                    LogUtils.d(TAG, "onResponse: save md5Str = " + md5Str);
                     startDownloadApk(otaModel);
                 }
-
             }
 
             @Override

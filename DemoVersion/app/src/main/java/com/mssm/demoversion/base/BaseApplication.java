@@ -50,6 +50,7 @@ public class BaseApplication extends Application {
         initBuglySetting();
         Utils.setHomeLauncher();
         setAutoBootApp();
+        sendDeleteOldResource();
     }
 
     /**
@@ -82,6 +83,14 @@ public class BaseApplication extends Application {
     private void setAutoBootApp() {
         Intent intent = new Intent("com.android.yf_set_auto_bootapp");
         intent.putExtra("package","com.mssm.demoversion");
+        sendBroadcast(intent);
+    }
+
+    /**
+     * 删除过期文件
+     */
+    private void sendDeleteOldResource() {
+        Intent intent = new Intent(Constant.ACTION_DELETE_LOG);
         sendBroadcast(intent);
     }
 

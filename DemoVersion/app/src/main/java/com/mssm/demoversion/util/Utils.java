@@ -18,7 +18,10 @@ import android.view.View;
 import com.mssm.demoversion.base.BaseApplication;
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -385,6 +388,30 @@ public class Utils {
         }
         Log.d(TAG, "getAppVersionCode: versioncode = " + versioncode);
         return versioncode;
+    }
+
+    /**
+     * 检查文件的实际MD5值是否与期望值一致，接收一个文件的URL和保存路径作为参数，返回一个布尔值
+     *
+     * @param expectedMD5 期望MD5
+     * @param filePath 保存路径
+     * @return 比较MD5是否和期望MD5值相等
+     */
+    public static boolean checkFileExistsAndMD5(String expectedMD5, String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            LogUtils.d(TAG, "checkMD5: file not exists");
+            return false;
+        }
+        try {
+            // 使用DigestUtils类计算文件的实际MD5值，并转换为16进制字符串
+            String actualMD5 = DigestUtils.md5Hex(new FileInputStream(filePath));
+            // 从HashMap中获取该文件的期望MD5值，并比较是否相等，返回结果
+            return actualMD5.equals(expectedMD5);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

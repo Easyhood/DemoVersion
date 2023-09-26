@@ -101,6 +101,8 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setVideo();
             if (list.size() == Constant.INDEX_1) {
                 ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setLooping();
+            } else {
+                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setStopLooping();
             }
         }
     }
@@ -259,10 +261,15 @@ public class AdvancePagerAdapter extends PagerAdapter implements ViewPager.OnPag
     }
 
     public void setResume() {
+        LogUtils.d(TAG, " start");
         pause = false;
         if (list.size() > 0 && list.get(viewPager.getCurrentItem()) instanceof AdvanceVideoView) {
             ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setRestart();
-            LogUtils.d(TAG, " start");
+            if (list.size() == Constant.INDEX_1) {
+                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setLooping();
+            } else {
+                ((AdvanceVideoView) list.get(viewPager.getCurrentItem())).setStopLooping();
+            }
         }
     }
 

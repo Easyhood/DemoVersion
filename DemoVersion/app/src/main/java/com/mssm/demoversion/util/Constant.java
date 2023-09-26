@@ -22,6 +22,9 @@ public class Constant {
     // 广告UUID key
     public static final String AD_UUID_KEY = "AD_UUID_KEY";
 
+    // OTA UUID key
+    public static final String OTA_UUID_KEY = "OTA_UUID_KEY";
+
     // 请求类型
     // 广告页面下载请求
     public static final int ADVERTISE_DOWNLOAD = 10001;
@@ -53,7 +56,7 @@ public class Constant {
 
     public static final long DELAY_MILLIS = 60000L;
 
-    public static final long DELAY_APK_MILLIS = 3*60*60*1000L;
+    public static final long DELAY_APK_MILLIS = 60*60*1000L;
 
     // 扫码通知标识
     // 扫码播放标识

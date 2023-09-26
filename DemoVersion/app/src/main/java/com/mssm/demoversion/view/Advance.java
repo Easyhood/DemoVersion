@@ -23,4 +23,37 @@ public class Advance {
         this.type = type;
         this.playTime = playTime;
     }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public long getPlayTime() {
+        return playTime;
+    }
+
+    public void setPlayTime(long playTime) {
+        this.playTime = playTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Advance{" +
+                "path='" + path + '\'' +
+                ", type='" + type + '\'' +
+                ", playTime=" + playTime +
+                '}';
+    }
 }

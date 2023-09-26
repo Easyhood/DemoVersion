@@ -140,4 +140,10 @@ public class AdvanceVideoView extends RelativeLayout {
         }
     }
 
+    public void setStopLooping() {
+        if (videoView != null) {
+            videoView.setLooping(false);
+        }
+    }
+
 }

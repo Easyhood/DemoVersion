@@ -80,6 +80,10 @@ public class MultiFileDownloadManager {
      */
     public void startMultiFileDownload(List<BaseFileDownloadModel> modelList) {
         LogUtils.d(TAG, "startMultiFileDownload: modelList: " + modelList.toString());
+        if (modelList == null || modelList.size() < Constant.INDEX_1) {
+            LogUtils.d(TAG, "startMultiFileDownload: modelList is null !");
+            return;
+        }
         if (successList != null) {
             successList.clear();
         }
@@ -98,6 +102,10 @@ public class MultiFileDownloadManager {
      */
     private void startSingleFileDownload(BaseFileDownloadModel downloadModel) {
         LogUtils.d(TAG, "startSingleFileDownload: downloadModel: " + downloadModel.toString());
+        if (downloadModel == null || downloadModel.getDownloadUrl() == null) {
+            LogUtils.d(TAG, "startSingleFileDownload: return !");
+            return;
+        }
         setExpectedMD5(downloadModel.getDownloadUrl(), downloadModel.getMd5Str());
         // 创建一个Request对象
         Request request = new Request.Builder()
@@ -105,6 +113,10 @@ public class MultiFileDownloadManager {
                 .build();
         // 创建一个Call对象，并将其添加到HashMap中
         Call call = okHttpClient.newCall(request);
+        if (downloadMap == null || downloadMap.isEmpty()) {
+            LogUtils.d(TAG, "startSingleFileDownload: downloadMap is null !");
+            return;
+        }
         downloadMap.get(downloadModel.getDownloadUrl()).call = call;
         // 使用enqueue方法发送异步请求，并在回调中处理下载逻辑
         call.enqueue(new Callback() {
@@ -240,9 +252,10 @@ public class MultiFileDownloadManager {
         int retryCount = retryMap.getOrDefault(downloadModel.getDownloadUrl(), 0);
         LogUtils.d(TAG, "retryDownload: retryCount : " + retryCount + "; url : " + downloadModel.getDownloadUrl());
         // 如果重试次数小于5，则增加1，并重新开始下载该文件
-        if (retryCount < 5) {
+        if (retryCount < Constant.INDEX_5) {
             retryCount++;
             retryMap.put(downloadModel.getDownloadUrl(), retryCount);
+            downloadMap.put(downloadModel.getDownloadUrl(), new DownloadInfo());
             startSingleFileDownload(downloadModel);
         } else {
             // 否则，删除该文件，并回调onFailure方法，传入一个异常信息
