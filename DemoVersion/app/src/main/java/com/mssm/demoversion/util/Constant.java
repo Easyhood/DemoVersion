@@ -12,7 +12,9 @@ public class Constant {
     // Bugly的APPID
     public static final String BUGLY_APPID = "e20b968e06";
 
-    public static final String EXIT_PASSWORD = "722405";
+    public static final String EXIT_PASSWORD = "88888888";
+
+    public static final String EXIT_OLD_PASSWORD = "722405";
 
     // 播放界面结束广播
     public static final String ACTION_DESTROYED = "com.mssm.action.DESTROYED";

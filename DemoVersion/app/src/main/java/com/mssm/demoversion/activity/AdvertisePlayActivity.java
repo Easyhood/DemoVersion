@@ -207,6 +207,8 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
         super.onPause();
         LogUtils.d(TAG, "onPause");
         mViewPager.setPause();
+        Intent intent = new Intent(Constant.ACTION_DESTROYED);
+        sendBroadcast(intent);
     }
 
 
@@ -260,6 +262,7 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
     /**
      * 编辑dialog
      */
+    @SuppressLint("StringFormatInvalid")
     public void DialogSeven() {
         final EditText editText = new EditText(AdvertisePlayActivity.this);
         editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
@@ -268,13 +271,15 @@ public class AdvertisePlayActivity extends AppCompatActivity implements AdDownlo
         editText.setMaxWidth(Constant.INDEX_10);
         editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constant.INDEX_10)});
         AlertDialog.Builder inputDialog = new AlertDialog.Builder(AdvertisePlayActivity.this, R.style.MyAlertDialogStyle);
-        inputDialog.setTitle(getString(R.string.exit_launcher_password)).setView(editText);
+        String exitStr = getResources().getString(R.string.exit_launcher_password);
+        exitStr = String.format(exitStr, Utils.getAppVersionName());
+        inputDialog.setTitle(exitStr).setView(editText);
         inputDialog.setPositiveButton(getString(R.string.exit_launcher_sure),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String enter = editText.getText().toString();
-                        if (Constant.EXIT_PASSWORD.equals(enter)) {
+                        if (Constant.EXIT_PASSWORD.equals(enter) || Constant.EXIT_OLD_PASSWORD.equals(enter)) {
                             startToSystemLauncher();
                         }
                     }

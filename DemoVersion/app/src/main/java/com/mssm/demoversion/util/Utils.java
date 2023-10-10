@@ -304,7 +304,9 @@ public class Utils {
      * @return serialNumber
      */
     public static String getCapitalDeviceSnNumber() {
-        String serialNumberStr = "EB06857510D27BD6";
+        // 693C351B999682EF 西影64号机子
+        // CA1C547777EFED27 小寨哆啦星球039
+        String serialNumberStr = "693C351B999682EF";
          yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
          serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
          Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
@@ -373,7 +375,7 @@ public class Utils {
     }
 
     /**
-     * 获取当前程序版本名(对消费者不可见的版本号)
+     * 获取当前程序版本号
      * @return 版本号
      */
     public static int getAppVersionCode() {
@@ -388,6 +390,23 @@ public class Utils {
         }
         Log.d(TAG, "getAppVersionCode: versioncode = " + versioncode);
         return versioncode;
+    }
+
+    /**
+     * 获取当前程序版本名
+     * @return 版本名
+     */
+    public static String getAppVersionName() {
+        String versionName = "";
+        try {
+            PackageManager pm = BaseApplication.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo("com.mssm.demoversion", 0);
+            versionName = pi.versionName;
+        } catch (Exception e) {
+            LogUtils.e(TAG, "Exception : " + e);
+        }
+        Log.d(TAG, "getAppVersionCode: versionName = " + versionName);
+        return versionName;
     }
 
     /**

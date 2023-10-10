@@ -246,7 +246,7 @@ public class HttpRequest {
                             "onResponse: stop ! cause serviceApkName is null or serviceApkVersion less than 5.0");
                     return;
                 }
-                if (Utils.getAppVersionCode() != serviceApkCode) {
+                if (Utils.getAppVersionCode() < serviceApkCode) {
                     if (md5Str == SharedPreferencesUtils.getString(BaseApplication.getContext(), Constant.OTA_UUID_KEY)) {
                         LogUtils.d(TAG, "onResponse: OTA_UUID_KEY is same ! OTA_UUID_KEY = " + md5Str);
                         return;

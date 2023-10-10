@@ -29,6 +29,6 @@
     <string name="timer_compute_run">"Countdown: "</string>
     <string name="timer_compute_end">"countdown ends"</string>
 
-    <string name="exit_launcher_password">"Exit Password："</string>
+    <string name="exit_launcher_password">"Exit Password：\n VersionName-%1$s"</string>
     <string name="exit_launcher_sure">"Sure"</string>
 </resources>

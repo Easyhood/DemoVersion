@@ -3,7 +3,10 @@ package com.mssm.demoversion.base;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 
+import com.mssm.demoversion.R;
 import com.mssm.demoversion.exception.MsCrashHandler;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.Utils;
