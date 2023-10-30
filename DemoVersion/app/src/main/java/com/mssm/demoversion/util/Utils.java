@@ -294,8 +294,8 @@ public class Utils {
      */
     public static String getDeviceSnNumber() {
         String serialNumberStr = "1E3D79E9E60F3625";
-        // yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
-        // serialNumberStr = yfapiManager.yfgetSerialNumber();
+         yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
+         serialNumberStr = yfapiManager.yfgetSerialNumber();
         return serialNumberStr;
     }
 
@@ -306,7 +306,7 @@ public class Utils {
     public static String getCapitalDeviceSnNumber() {
         // 693C351B999682EF 西影64号机子
         // CA1C547777EFED27 小寨哆啦星球039
-        String serialNumberStr = "693C351B999682EF";
+        String serialNumberStr = "CA1C547777EFED27";
          yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
          serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
          Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);

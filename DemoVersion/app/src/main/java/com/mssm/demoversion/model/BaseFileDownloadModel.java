@@ -18,6 +18,8 @@ public class BaseFileDownloadModel {
 
     private String md5Str;
 
+    private boolean isPlay;
+
     private int filePlayTime;
 
     // 应用名称
@@ -61,6 +63,14 @@ public class BaseFileDownloadModel {
 
     public void setMd5Str(String md5Str) {
         this.md5Str = md5Str;
+    }
+
+    public boolean getIsPlay() {
+        return isPlay;
+    }
+
+    public void setIsPlay(boolean isPlay) {
+        this.isPlay = isPlay;
     }
 
     public int getFilePlayTime() {
@@ -110,6 +120,7 @@ public class BaseFileDownloadModel {
                 ", saveFilePath='" + saveFilePath + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", md5Str='" + md5Str + '\'' +
+                ", isPlay=" + isPlay +
                 ", filePlayTime=" + filePlayTime +
                 ", apkName='" + apkName + '\'' +
                 ", versionName='" + versionName + '\'' +

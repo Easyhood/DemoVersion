@@ -73,7 +73,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
 
     private Bitmap qrBitmap;
 
-    private String qrUrl = "https://test-admin.woozatop.com//ad_files/20230716/281c8692-2fc4-463c-bfac-618956d17566.png";
+    private String qrUrl = "888666";
 
     private int qrWidth = 360;
     private int qrHeight = 360;

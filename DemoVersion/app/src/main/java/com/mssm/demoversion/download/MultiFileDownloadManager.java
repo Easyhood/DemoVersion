@@ -173,7 +173,7 @@ public class MultiFileDownloadManager {
                 // 检查文件的MD5值是否与期望值一致，如果是，则回调onSuccess方法，并将文件保存路径添加到successList中
                 if (checkMD5(downloadModel.getDownloadUrl(), downloadModel.getSaveFilePath())) {
                     downloadModel.getListener().onSuccess(downloadModel.getDownloadUrl(), downloadModel.getSaveFilePath());
-                    if (!successList.contains(downloadModel)) {
+                    if (!successList.contains(downloadModel) && downloadModel.getIsPlay()) {
                         successList.add(downloadModel);
                     }
                     // 检查是否所有文件都下载结束

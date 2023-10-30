@@ -162,6 +162,10 @@ public class AdvertiseModel {
         @SerializedName("updated_at")
         private String matUpdatedAt;
 
+        // 是否播放
+        @SerializedName("is_play")
+        private boolean isPlay;
+
         // 播放时长（秒）
         @SerializedName("play_time")
         private int playTime;
@@ -206,6 +210,10 @@ public class AdvertiseModel {
             return matUpdatedAt;
         }
 
+        public boolean getIsPlay() {
+            return isPlay;
+        }
+
         public int getPlayTime() {
             return playTime;
         }
@@ -223,6 +231,7 @@ public class AdvertiseModel {
                     ", mgrUserUUID='" + mgrUserUUID + '\'' +
                     ", matCreatedAt='" + matCreatedAt + '\'' +
                     ", matUpdatedAt='" + matUpdatedAt + '\'' +
+                    ", isPlay=" + isPlay +
                     ", playTime=" + playTime +
                     '}';
         }

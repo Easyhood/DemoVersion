@@ -124,12 +124,13 @@ public class HttpRequest {
                 String saveFilePath = Utils.checkDownloadFilePath(Utils.getFileName(filePath));
                 String fileType = model.getData().get(i).getAdMaterials().get(j).getMatType();
                 String md5Str = model.getData().get(i).getAdMaterials().get(j).getFileMD5();
+                boolean isPlay = model.getData().get(i).getAdMaterials().get(j).getIsPlay();
                 int playTime = model.getData().get(i).getAdMaterials().get(j).getPlayTime() * 1000;
                 if (Utils.checkFileExistsAndMD5(md5Str, saveFilePath)) {
-                    if (Constant.IMAGE_TYPE.equals(fileType)) {
+                    if (Constant.IMAGE_TYPE.equals(fileType) && isPlay) {
                         Advance imageAdvance = new Advance(saveFilePath, Constant.IMAGE_INDEX, playTime);
                         mData.add(imageAdvance);
-                    } else if (Constant.VIDEO_TYPE.equals(fileType)) {
+                    } else if (Constant.VIDEO_TYPE.equals(fileType) && isPlay) {
                         Advance videoAdvance = new Advance(saveFilePath, Constant.VIDEO_INDEX, playTime);
                         mData.add(videoAdvance);
                     } else {
@@ -141,6 +142,7 @@ public class HttpRequest {
                     downloadModel.setSaveFilePath(saveFilePath);
                     downloadModel.setFileType(fileType);
                     downloadModel.setMd5Str(md5Str);
+                    downloadModel.setIsPlay(isPlay);
                     downloadModel.setFilePlayTime(playTime);
                     downloadModel.setListener(this.adListener);
                     if (!mFileDownloadTask.contains(downloadUrl)) {
@@ -246,7 +248,7 @@ public class HttpRequest {
                             "onResponse: stop ! cause serviceApkName is null or serviceApkVersion less than 5.0");
                     return;
                 }
-                if (Utils.getAppVersionCode() < serviceApkCode) {
+                if (Utils.getAppVersionCode() != serviceApkCode) {
                     if (md5Str == SharedPreferencesUtils.getString(BaseApplication.getContext(), Constant.OTA_UUID_KEY)) {
                         LogUtils.d(TAG, "onResponse: OTA_UUID_KEY is same ! OTA_UUID_KEY = " + md5Str);
                         return;
@@ -284,6 +286,7 @@ public class HttpRequest {
         downloadModel.setApkName(otaModel.getData().getApkName());
         downloadModel.setVersionName(otaModel.getData().getVersionName());
         downloadModel.setVersionCode(otaModel.getData().getVersionCode());
+        downloadModel.setIsPlay(true);
         downloadModel.setListener(this.apkListener);
         mApkDownloadTask.add(downloadModel);
         mDownloadManager.startMultiFileDownload(mApkDownloadTask);
