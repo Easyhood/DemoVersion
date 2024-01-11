@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -306,7 +307,8 @@ public class Utils {
     public static String getCapitalDeviceSnNumber() {
         // 693C351B999682EF 西影64号机子
         // CA1C547777EFED27 小寨哆啦星球039
-        String serialNumberStr = "CA1C547777EFED27";
+        // 小寨 8A01BD7A1FB6E09E
+        String serialNumberStr = "8A01BD7A1FB6E09E";
          yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
          serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
          Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);
@@ -385,6 +387,7 @@ public class Utils {
             PackageInfo pi = pm.getPackageInfo("com.mssm.demoversion", 0);
             long versionCodeL = pi.getLongVersionCode();
             versioncode = new Long(versionCodeL).intValue();
+            Log.d(TAG, "com.mssm.demoversion getAppVersionCode: " + versioncode);
         } catch (Exception e) {
             LogUtils.e(TAG, "Exception : " + e);
         }
@@ -431,6 +434,21 @@ public class Utils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 获取请求头签名
+     * @return md5Str
+     */
+    public static String getSignatureMd5Str(String queryPath) {
+        String signatureMd5Str = null;
+        String jsonStr = null;
+        String queryMethod = "GET";
+        String deviceSnNumber = getCapitalDeviceSnNumber();
+        jsonStr = queryPath + queryMethod + deviceSnNumber;
+        LogUtils.d(TAG, "jsonStr = " + jsonStr);
+        signatureMd5Str = DigestUtils.md5Hex(jsonStr.getBytes(StandardCharsets.UTF_8));
+        return signatureMd5Str;
     }
 
 }

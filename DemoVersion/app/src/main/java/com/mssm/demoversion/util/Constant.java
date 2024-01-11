@@ -27,6 +27,15 @@ public class Constant {
     // OTA UUID key
     public static final String OTA_UUID_KEY = "OTA_UUID_KEY";
 
+    // 预加载UUID key
+    public static final String NEW_RES_UUID_KEY = "NEW_RES_UUID_KEY";
+
+    // 预加载资源下载状态 - 下载中
+    public static final String STATUS_DOWNLOADING = "downloading";
+
+    // 预加载资源下载状态 - 下载完成
+    public static final String STATUS_FINISHED = "finished";
+
     // 请求类型
     // 广告页面下载请求
     public static final int ADVERTISE_DOWNLOAD = 10001;
@@ -59,6 +68,8 @@ public class Constant {
     public static final long DELAY_MILLIS = 60000L;
 
     public static final long DELAY_APK_MILLIS = 60*60*1000L;
+
+    public static final long DELAY_NEW_RESOURCE_MILLIS = 47*1000L;
 
     // 扫码通知标识
     // 扫码播放标识

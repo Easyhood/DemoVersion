@@ -21,20 +21,26 @@ import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.activity.ScanQRCodeActivity;
 import com.mssm.demoversion.base.BaseApplication;
 import com.mssm.demoversion.http.HttpRequest;
+import com.mssm.demoversion.http.HttpResRequest;
 import com.mssm.demoversion.presenter.ApkDownloadFinishedListener;
+import com.mssm.demoversion.presenter.ResourceDownloadFinishedListener;
 import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.SharedPreferencesUtils;
 import com.mssm.demoversion.util.Utils;
+import com.mssm.demoversion.view.Advance;
 import com.youngfeel.yf_rk356x_api.YF_RK356x_API_Manager;
+
+import java.util.List;
 
 /**
  * @author Easyhood
  * @desciption 守护进程服务
  * @since 2023/7/14
  **/
-public class DaemonService extends Service implements ApkDownloadFinishedListener {
+public class DaemonService extends Service implements ApkDownloadFinishedListener,
+        ResourceDownloadFinishedListener {
 
     private static final String TAG = "DaemonService";
 
@@ -48,7 +54,13 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
     private Handler cycleHandler;
     private Runnable cycleRunnable;
 
+    // 循环预加载资源请求变量声明
+    private Handler cycleResHandler;
+    private Runnable cycleResRunnable;
+
     private HttpRequest httpRequest;
+
+    private HttpResRequest httpResRequest;
 
     private YF_RK356x_API_Manager yfManager;
 
@@ -76,14 +88,18 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
         destroyReceiver = new DestroyReceiver();
         handler = new Handler();
         cycleHandler = new Handler();
+        cycleResHandler = new Handler();
         httpRequest = new HttpRequest();
+        httpResRequest = new HttpResRequest();
         yfManager = new YF_RK356x_API_Manager(BaseApplication.getContext());
         CallBackUtils.setApkDownloadFinishedListener(this);
+        CallBackUtils.setResourceDownloadFinishedListener(this);
         // register the receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ACTION_DESTROYED);
         registerReceiver(destroyReceiver, filter);
         startCycleRequestApk();
+        startCycleRequestRes();
     }
 
 
@@ -106,6 +122,7 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
         unregisterReceiver(destroyReceiver);
         handler.removeCallbacksAndMessages(null);
         cycleHandler.removeCallbacks(cycleRunnable);
+        cycleResHandler.removeCallbacks(cycleResRunnable);
     }
 
     /**
@@ -134,6 +151,12 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
             return;
         }
         installApkPackage(savePath);
+    }
+
+    @Override
+    public void onResourceDownloadFinished(String status) {
+        Log.d(TAG, "onResourceDownloadFinished: status = " + status);
+        httpResRequest.pushResourceDownloadStatus(status);
     }
 
     /**
@@ -198,5 +221,20 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
         intent.putExtra("path",apkPath);
         intent.putExtra("isboot",true);
         sendBroadcast(intent);
+    }
+
+
+    /**
+     * 开始循环请求预加载资源线程
+     */
+    private void startCycleRequestRes() {
+        cycleResRunnable = new Runnable() {
+            @Override
+            public void run() {
+                httpResRequest.requestNewResource();
+                cycleResHandler.postDelayed(cycleResRunnable, Constant.DELAY_NEW_RESOURCE_MILLIS);
+            }
+        };
+        cycleResHandler.post(cycleResRunnable);
     }
 }
