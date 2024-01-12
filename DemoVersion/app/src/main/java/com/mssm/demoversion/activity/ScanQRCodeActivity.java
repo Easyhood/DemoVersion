@@ -75,6 +75,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
 
     private String qrUrl = "888666";
 
+    private String mSaveFilePath;
+
     private int qrWidth = 360;
     private int qrHeight = 360;
 
@@ -144,6 +146,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
             return;
         }
         String mqttModelStr = intent.getStringExtra("bean");
+        mSaveFilePath = intent.getStringExtra("savePath");
         LogUtils.d(TAG, "init: mqttModelStr = " + mqttModelStr);
         if (mqttModelStr == null) {
             return;
@@ -203,8 +206,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
     private void startPlay() {
         LogUtils.d(TAG, "startPlay: Easyhood");
         //加载视频资源
-        Uri uri = getBoxUri();
-        videoView.setVideoURI(uri);
+        setBoxVideoRes();
         videoView.start();
         //设置监听
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -267,22 +269,33 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
      *
      * @return boxUri
      */
-    private Uri getBoxUri() {
-        Uri boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+    private void setBoxVideoRes() {
+        Uri boxUri = null;
         if (mqttModel == null) {
-            return boxUri;
+            return ;
         }
+        String saveFileMd5Str = mqttModel.getTopLayerModel().getTopBgImageModel().getResType();
         int boxValue = mqttModel.getBgLayerModel().getBgStartResName();
         if (Constant.BOX_BLACK_VALUE == boxValue) {
             boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+            videoView.setVideoURI(boxUri);
         } else if (Constant.BOX_BLUE_VALUE == boxValue) {
             boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_blue_av);
+            videoView.setVideoURI(boxUri);
         } else if (Constant.BOX_GOLD_VALUE == boxValue) {
             boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
+            videoView.setVideoURI(boxUri);
+        } else if (Constant.BOX_OTHER_VALUE == boxValue){
+            if (Utils.checkFileExistsAndMD5(saveFileMd5Str, mSaveFilePath)) {
+                videoView.setVideoPath(mSaveFilePath);
+            } else {
+                boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+                videoView.setVideoURI(boxUri);
+            }
         } else {
             boxUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+            videoView.setVideoURI(boxUri);
         }
-        return boxUri;
     }
 
     /**
@@ -292,6 +305,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
         if (mqttModel == null) {
             return;
         }
+        String saveFileMd5Str = mqttModel.getTopLayerModel().getTopBgImageModel().getResType();
         int boxValue = mqttModel.getBgLayerModel().getBgStartResName();
         if (Constant.BOX_BLACK_VALUE == boxValue) {
             ivQrCodeBg.setImageResource(R.drawable.mssq_black_img);
@@ -299,6 +313,13 @@ public class ScanQRCodeActivity extends AppCompatActivity implements View.OnClic
             ivQrCodeBg.setImageResource(R.drawable.mssq_blue_img);
         } else if (Constant.BOX_GOLD_VALUE == boxValue) {
             ivQrCodeBg.setImageResource(R.drawable.mssq_gold_img);
+        } else if (Constant.BOX_OTHER_VALUE == boxValue){
+            if (Utils.checkFileExistsAndMD5(saveFileMd5Str, mSaveFilePath)) {
+                Uri uri = Uri.parse(mSaveFilePath);
+                ivQrCodeBg.setImageURI(uri);
+            } else {
+                ivQrCodeBg.setImageResource(R.drawable.mssq_black_img);
+            }
         } else {
             ivQrCodeBg.setImageResource(R.drawable.mssq_black_img);
         }

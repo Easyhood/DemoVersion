@@ -2,7 +2,9 @@ package com.mssm.demoversion.util;
 
 import com.mssm.demoversion.presenter.AdDownloadFinishedListener;
 import com.mssm.demoversion.presenter.ApkDownloadFinishedListener;
+import com.mssm.demoversion.presenter.EndBgResDownloadFinishedListener;
 import com.mssm.demoversion.presenter.ResourceDownloadFinishedListener;
+import com.mssm.demoversion.presenter.ScanQRCResDownloadFinishedListener;
 import com.mssm.demoversion.presenter.TimerComputedListener;
 import com.mssm.demoversion.view.Advance;
 
@@ -22,6 +24,10 @@ public class CallBackUtils {
     private static ApkDownloadFinishedListener apkDownloadFinishedListener;
 
     private static ResourceDownloadFinishedListener resourceDownloadFinishedListener;
+
+    private static EndBgResDownloadFinishedListener endBgResDownloadFinishedListener;
+
+    private static ScanQRCResDownloadFinishedListener scanQRCResDownloadFinishedListener;
 
     /**
      * 设置倒计时结束监听
@@ -85,5 +91,38 @@ public class CallBackUtils {
      */
     public static void doResourceDownloadFinishedListener(String status) {
         resourceDownloadFinishedListener.onResourceDownloadFinished(status);
+    }
+
+
+    /**
+     * 设置结束界面资源下载结束监听
+     * @param listener EndBgResDownloadFinishedListener
+     */
+    public static void setEndBgResDownloadFinishedListener(EndBgResDownloadFinishedListener listener) {
+        endBgResDownloadFinishedListener = listener;
+    }
+
+    /**
+     * 结束界面资源下载状态
+     * @param savePath 下载地址
+     */
+    public static void doEndBgResDownloadFinishedListener(String savePath) {
+        endBgResDownloadFinishedListener.onEndBgResDownloadFinished(savePath);
+    }
+
+    /**
+     * 设置宝箱二维码界面资源下载结束监听
+     * @param listener ScanQRCResDownloadFinishedListener
+     */
+    public static void setScanQRCResDownloadFinishedListener(ScanQRCResDownloadFinishedListener listener) {
+        scanQRCResDownloadFinishedListener = listener;
+    }
+
+    /**
+     * 宝箱二维码界面资源下载状态
+     * @param savePath 下载地址
+     */
+    public static void doScanQRCResDownloadFinishedListener(String savePath) {
+        scanQRCResDownloadFinishedListener.onScanQRCResDownloadFinished(savePath);
     }
 }

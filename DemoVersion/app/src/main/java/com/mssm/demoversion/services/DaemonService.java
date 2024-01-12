@@ -235,6 +235,6 @@ public class DaemonService extends Service implements ApkDownloadFinishedListene
                 cycleResHandler.postDelayed(cycleResRunnable, Constant.DELAY_NEW_RESOURCE_MILLIS);
             }
         };
-        cycleResHandler.post(cycleResRunnable);
+        cycleResHandler.postDelayed(cycleResRunnable, Constant.DELAY_NEW_RESOURCE_MILLIS);
     }
 }

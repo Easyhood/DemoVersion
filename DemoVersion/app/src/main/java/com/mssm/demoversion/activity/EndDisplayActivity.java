@@ -41,10 +41,14 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
 
     private MqttModel mqttModel;
 
+    private String mSaveFilePath;
+
     //播放列表
     private List<Uri> playlist;
 
     private int currentVideoIndex;
+
+    private int bgStartResNameIndex;
 
     private long playTimeL;
 
@@ -78,14 +82,15 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
         playlist.add(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av));
         currentVideoIndex = 0;
         if (mqttModel.getBgLayerModel().getBgResType().equals(Constant.VIDEO_TYPE)) {
-            // videoEndBg.setVisibility(View.VISIBLE);
-            videoEndBg.setVisibility(View.INVISIBLE);
-            ivEndBg.setVisibility(View.VISIBLE);
-            // startPlay();
+            tvEndTitle.setVisibility(View.VISIBLE);
+            videoEndBg.setVisibility(View.VISIBLE);
+            ivEndBg.setVisibility(View.INVISIBLE);
+            startPlay();
         } else {
+            tvEndTitle.setVisibility(View.VISIBLE);
             videoEndBg.setVisibility(View.INVISIBLE);
             ivEndBg.setVisibility(View.VISIBLE);
-            // ivEndBg.setImageResource(R.drawable.mssq_gold_img);
+            setImageBg();
         }
         tvEndTitle.setText(endTitle);
         new Handler().postDelayed(new Runnable() {
@@ -108,6 +113,7 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
             return;
         }
         String mqttModelStr = intent.getStringExtra("bean");
+        mSaveFilePath = intent.getStringExtra("savePath");
         LogUtils.d(TAG, "init: mqttModelStr = " + mqttModelStr);
         if (mqttModelStr == null) {
             return;
@@ -119,6 +125,7 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
             mqttModel = gson.fromJson(messageJson, MqttModel.class);
             playTimeL = Long.valueOf((mqttModel.getDisplayTime() + 1) * 1000);
             endTitle = mqttModel.getEndText();
+            bgStartResNameIndex = mqttModel.getBgLayerModel().getBgStartResName();
         } catch (Exception exception) {
             LogUtils.e(TAG, "initMqttModel: exception is " + exception);
             startAdvertisePlayActivity(this.getApplicationContext());
@@ -159,8 +166,7 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
     private void startPlay() {
         LogUtils.d(TAG, "startPlay: Easyhood");
         //加载视频资源
-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
-        videoEndBg.setVideoURI(uri);
+        setVideoEndBgRes(videoEndBg);
         videoEndBg.start();
         //设置监听
         videoEndBg.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -186,6 +192,62 @@ public class EndDisplayActivity extends AppCompatActivity implements View.OnClic
             Intent activityIntent = new Intent(context, AdvertisePlayActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(activityIntent);
+        }
+    }
+
+    /**
+     * 初始化video资源
+     * @param videoEndBg VideoView
+     */
+    private void setVideoEndBgRes(VideoView videoEndBg) {
+        //加载视频资源
+        if (bgStartResNameIndex == Constant.INDEX_301) {
+            tvEndTitle.setVisibility(View.INVISIBLE);
+            videoEndBg.setVideoPath(mSaveFilePath);
+        } else {
+            Uri uri = getVideoUri();
+            videoEndBg.setVideoURI(uri);
+        }
+    }
+
+    /**
+     * 获取视频素材的Uri
+     * @return uri 素材的Uri
+     */
+    private Uri getVideoUri() {
+        Uri uri = null;
+        if (bgStartResNameIndex == Constant.INDEX_0) {
+            uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_black_av);
+        } else if (bgStartResNameIndex == Constant.INDEX_1) {
+            uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_blue_av);
+        } else if (bgStartResNameIndex == Constant.INDEX_2) {
+            uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.mssq_gold_av);
+        } else if (bgStartResNameIndex == Constant.INDEX_301) {
+            tvEndTitle.setVisibility(View.INVISIBLE);
+            uri = Uri.parse(endTitle);
+        } else {
+            uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.end_black_av);
+        }
+        return uri;
+    }
+
+
+    /**
+     * 设置背景图片
+     */
+    private void setImageBg() {
+        if (bgStartResNameIndex == Constant.INDEX_0) {
+            ivEndBg.setImageResource(R.drawable.mssq_black_img);
+        } else if (bgStartResNameIndex == Constant.INDEX_1) {
+            ivEndBg.setImageResource(R.drawable.mssq_blue_img);
+        } else if (bgStartResNameIndex == Constant.INDEX_2) {
+            ivEndBg.setImageResource(R.drawable.mssq_gold_img);
+        } else if (bgStartResNameIndex == Constant.INDEX_301) {
+            tvEndTitle.setVisibility(View.INVISIBLE);
+            Uri uri = Uri.parse(mSaveFilePath);
+            ivEndBg.setImageURI(uri);
+        } else {
+            ivEndBg.setImageResource(R.color.black);
         }
     }
 }

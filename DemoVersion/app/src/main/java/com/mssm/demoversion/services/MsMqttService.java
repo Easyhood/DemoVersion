@@ -21,7 +21,12 @@ import com.mssm.demoversion.R;
 import com.mssm.demoversion.activity.AdvertisePlayActivity;
 import com.mssm.demoversion.activity.EndDisplayActivity;
 import com.mssm.demoversion.activity.ScanQRCodeActivity;
+import com.mssm.demoversion.base.BaseApplication;
+import com.mssm.demoversion.download.BgResDownloadManager;
 import com.mssm.demoversion.model.MqttModel;
+import com.mssm.demoversion.presenter.EndBgResDownloadFinishedListener;
+import com.mssm.demoversion.presenter.ScanQRCResDownloadFinishedListener;
+import com.mssm.demoversion.util.CallBackUtils;
 import com.mssm.demoversion.util.Constant;
 import com.mssm.demoversion.util.LogUtils;
 import com.mssm.demoversion.util.Utils;
@@ -34,7 +39,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +48,8 @@ import java.util.concurrent.TimeUnit;
  * @desciption MQTT服务进程
  * @since 2023/7/14
  **/
-public class MsMqttService extends Service {
+public class MsMqttService extends Service implements EndBgResDownloadFinishedListener,
+        ScanQRCResDownloadFinishedListener {
 
     private static final String TAG = "MsMqttService";
     private static final int NOTIFICATION_ID = 1001;
@@ -56,6 +61,8 @@ public class MsMqttService extends Service {
     private MqttConnectOptions options;
     private ScheduledExecutorService scheduler;
     private String messageJson;
+
+    private BgResDownloadManager mBgResDownloadManager;
 
     private boolean isReceived = false;
 
@@ -111,12 +118,11 @@ public class MsMqttService extends Service {
                 setMqttModel(mqttModel);
                 LogUtils.d(TAG, "messageArrived: mqttModel.cmdStr = " + mqttModel.getCmdStr());
                 if (Constant.DISPLAY_RT_EVENT.equals(mqttModel.getCmdStr())) {
-                    // startResMultiDownload(mqttModel);
-                    startToScanQRCode(getApplicationContext());
+                    startScanCodeByResNameIndex(mqttModel);
                 } else if (Constant.END_RT_EVENT.equals(mqttModel.getCmdStr())) {
                     LogUtils.d(TAG, "messageArrived: getDisplayTime = " + mqttModel.getDisplayTime());
                     if (mqttModel.getDisplayTime() != Constant.INDEX_0) {
-                        startToEndDisplay(getApplicationContext());
+                        startEndDisByResNameIndex(mqttModel);
                     } else {
                         startAdvertisePlayActivity(getApplicationContext());
                     }
@@ -142,6 +148,7 @@ public class MsMqttService extends Service {
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler();
+        mBgResDownloadManager = new BgResDownloadManager();
         // 8.0 以上需要特殊处理
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channelId = createNotificationChannel("com.mssm.mqtt",
@@ -158,6 +165,8 @@ public class MsMqttService extends Service {
         // make the service foreground
         startForeground(NOTIFICATION_ID, notification);
         mqttInit();
+        CallBackUtils.setEndBgResDownloadFinishedListener(this);
+        CallBackUtils.setScanQRCResDownloadFinishedListener(this);
     }
 
     @Override
@@ -305,10 +314,11 @@ public class MsMqttService extends Service {
      *
      * @param context Context
      */
-    private void startToScanQRCode(Context context) {
+    private void startToScanQRCode(Context context, String savePath) {
         Intent intent = new Intent(context, ScanQRCodeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("bean", messageJson);
+        intent.putExtra("savePath", savePath);
         startActivity(intent);
     }
 
@@ -317,10 +327,11 @@ public class MsMqttService extends Service {
      *
      * @param context Context
      */
-    private void startToEndDisplay(Context context) {
+    private void startToEndDisplay(Context context, String savePath) {
         Intent intent = new Intent(context, EndDisplayActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("bean", messageJson);
+        intent.putExtra("savePath", savePath);
         startActivity(intent);
     }
 
@@ -346,5 +357,41 @@ public class MsMqttService extends Service {
                 isReceived = false;
             }
         }, Constant.PROTECT_DELAY_TIMES);
+    }
+
+    @Override
+    public void onEndBgResDownloadFinished(String savePath) {
+        startToEndDisplay(BaseApplication.getContext(), savePath);
+    }
+
+    /**
+     * 通过ResNameIndex来决定进入EndDis的方式
+     * @param mqttModel MqttModel
+     */
+    private void startEndDisByResNameIndex(MqttModel mqttModel) {
+        int resNameIndex = mqttModel.getBgLayerModel().getBgStartResName();
+        if (Constant.INDEX_301 == resNameIndex) {
+            mBgResDownloadManager.startDownloadEndBgRes(mqttModel);
+        } else {
+            startToEndDisplay(BaseApplication.getContext(), null);
+        }
+    }
+
+    @Override
+    public void onScanQRCResDownloadFinished(String savePath) {
+        startToScanQRCode(BaseApplication.getContext(), savePath);
+    }
+
+    /**
+     * 通过ResNameIndex来决定进入ScanCode的方式
+     * @param mqttModel MqttModel
+     */
+    private void startScanCodeByResNameIndex(MqttModel mqttModel) {
+        int resNameIndex = mqttModel.getBgLayerModel().getBgStartResName();
+        if (Constant.INDEX_3 == resNameIndex) {
+            mBgResDownloadManager.startDownloadEndBgRes(mqttModel);
+        } else {
+            startToScanQRCode(BaseApplication.getContext(), null);
+        }
     }
 }

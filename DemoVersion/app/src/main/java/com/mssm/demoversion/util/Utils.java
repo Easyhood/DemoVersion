@@ -308,7 +308,8 @@ public class Utils {
         // 693C351B999682EF 西影64号机子
         // CA1C547777EFED27 小寨哆啦星球039
         // 小寨 8A01BD7A1FB6E09E
-        String serialNumberStr = "8A01BD7A1FB6E09E";
+        // 西影 ABF7D16F3C1283D5
+        String serialNumberStr = "ABF7D16F3C1283D5";
          yfapiManager = new YF_RK356x_API_Manager(BaseApplication.getInstances());
          serialNumberStr = yfapiManager.yfgetSerialNumber().toUpperCase();
          Log.d(TAG, "getCapitalDeviceSnNumber: serialNumberStr = " + serialNumberStr);

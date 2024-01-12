@@ -104,6 +104,8 @@ public class Constant {
 
     public static final int INDEX_25 = 25;
     public static final int INDEX_60 = 60;
+
+    public static final int INDEX_301 = 301;
     public static final int INDEX_1000 = 1000;
 
     public static final int INDEX_10000 = 10000;
@@ -112,5 +114,7 @@ public class Constant {
     public static final int BOX_BLACK_VALUE = 0;
     public static final int BOX_BLUE_VALUE = 1;
     public static final int BOX_GOLD_VALUE = 2;
+
+    public static final int BOX_OTHER_VALUE = 3;
 
 }
